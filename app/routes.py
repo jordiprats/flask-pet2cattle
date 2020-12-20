@@ -35,7 +35,7 @@ def post(any, mes, slug):
                     post_html = md.convert(md_data)
                     post_metadata = md.Meta
                     page_url = '/'+any+'/'+mes+'/'+filename_slug
-                    return render_template('post.html', post_html=post_html, post_metadata=post_metadata, page_url=page_url)
+                    return render_template('post.html', single=True, post_html=post_html, post_metadata=post_metadata, page_url=page_url)
 
     abort(404)
 
@@ -71,4 +71,4 @@ def index():
 
                 posts.append(post)
 
-    return render_template('index.html', posts=posts, post_metadata=post_metadata, page_url='https://pet2cattle.com')
+    return render_template('index.html', single=False, posts=posts, post_metadata=post_metadata, page_url='https://pet2cattle.com')
