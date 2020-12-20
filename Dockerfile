@@ -8,4 +8,5 @@ COPY sillyhttpsredirector.py .
 
 EXPOSE 9000
 
-CMD [ "python", "./sillyhttpsredirector.py" ] 
+#TODO: gunicorn
+CMD [ "flask", "run", "-p", '9000' ] 
