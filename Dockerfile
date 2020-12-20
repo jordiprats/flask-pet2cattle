@@ -7,7 +7,7 @@ RUN pip install gunicorn
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY sillyhttpsredirector.py .
+COPY app .
 
 EXPOSE 8000
 
