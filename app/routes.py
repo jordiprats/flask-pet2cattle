@@ -24,7 +24,10 @@ def post(any, mes, slug):
     print('post')
     for path, dirnames, filenames in sorted(os.walk(os.path.join('app', 'posts', any, mes))):
         for filename in filenames:
-            filename_slug = slugify(re.sub('^[0-9]+ ', '', filename))
+            if not re.match(r'[0-9]+ ', filename):
+                # when the filename does not start with a number it's a draft - skipping it
+                continue
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', filename))
 
             if slug==filename_slug:
                 md_file = os.path.join(path, filename)
@@ -51,11 +54,15 @@ def index():
     posts = []
     for path, dirnames, filenames in sorted(os.walk('app/posts')):
         for filename in filenames:
+            if not re.match(r'[0-9]+ ', filename):
+                # when the filename does not start with a number it's a draft - skipping it
+                continue
+
             md_file = os.path.join(path, filename)
-            filename_slug = slugify(re.sub('^[0-9]+ ', '', filename))
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', filename))
             with open(md_file, 'r') as reader:
                 post = {}
-                lines = reader.readlines(2000)
+                lines = reader.readlines(10000)
 
                 excerpt = ''
                 for line in lines:
@@ -67,7 +74,7 @@ def index():
                 excerpt_html = md.convert(excerpt)
                 post['url'] = re.sub('app/posts', '', path)+'/'+filename_slug
                 post['meta'] = md.Meta
-                post['excerpt'] = re.sub('<h1>.*</h1>', '', excerpt_html)
+                post['excerpt'] = re.sub(r'<h1>.*</h1>', '', excerpt_html)
 
                 posts.append(post)
 
