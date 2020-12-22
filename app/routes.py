@@ -51,8 +51,9 @@ def index():
     post_metadata['title']=['From pet to cattle']
     post_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
     posts = []
-    for path, dirnames, filenames in sorted(os.walk('app/posts')):
-        for filename in filenames:
+    for path, dirnames, filenames in os.walk('app/posts'):
+        for filename in sorted(filenames, reverse=True):
+            print(filename)
             if not re.match(r'[0-9]+ ', filename):
                 # when the filename does not start with a number it's a draft - skipping it
                 continue

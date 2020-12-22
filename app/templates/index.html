@@ -12,7 +12,7 @@
 
         <ul>
         {% for post in posts %}
-            <li>
+            <li style="margin-top: 30px;">
                 <h2><a href="{{ post['url'] }}">{{ post['meta']['title'][0] }}</a></h2>
                 {{ post['excerpt'] | safe }}
                 <a href="{{ post['url'] }}">Read more...</a>
