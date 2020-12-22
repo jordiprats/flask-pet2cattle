@@ -21,7 +21,6 @@ md = Markdown(app,
 
 @app.route('/<any>/<mes>/<slug>')
 def post(any, mes, slug):
-    print('post')
     for path, dirnames, filenames in sorted(os.walk(os.path.join('app', 'posts', any, mes))):
         for filename in filenames:
             if not re.match(r'[0-9]+ ', filename):
@@ -43,7 +42,7 @@ def post(any, mes, slug):
     abort(404)
 
 @app.route('/about')
-def about():    
+def about():
     return redirect('https://github.com/jordiprats', code=302)
 
 @app.route('/')
@@ -79,3 +78,7 @@ def index():
                 posts.append(post)
 
     return render_template('index.html', single=False, posts=posts, post_metadata=post_metadata, page_url='https://pet2cattle.com')
+
+@app.route('/<path:path>')
+def catch_all(path):
+    abort(404)
