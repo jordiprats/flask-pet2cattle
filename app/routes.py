@@ -37,8 +37,19 @@ def post(any, mes, slug):
                         post_html = md.convert(md_data)
                         post_metadata = md.Meta
                         page_url = '/'+any+'/'+mes+'/'+filename_slug
+                        try:
+                            keywords = []
+                            for keyword in md.Meta['keywords'][0].split(','):
+                                keywords.append(keyword.strip())
+                        except:
+                            keywords = []
                         if md.Meta['status'][0]=='published':
-                            return render_template('post.html', single=True, post_html=post_html, post_metadata=post_metadata, page_url=page_url)
+                            return render_template('post.html', 
+                                                                single=True, 
+                                                                post_html=post_html, 
+                                                                post_metadata=post_metadata, 
+                                                                page_url=page_url, 
+                                                                keywords=keywords)
                         break
                     except:
                         break

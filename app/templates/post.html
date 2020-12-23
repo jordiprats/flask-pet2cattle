@@ -40,18 +40,14 @@
             <div class="row">
               <div class="col-lg-6">
                 <ul class="list-unstyled mb-0">
+                  {% for keyword in keywords %}
                   <li>
-                    <a href="#">kubernetes</a>
+                    {{ keyword }}
                   </li>
-                  <li>
-                    <a href="#">terraform</a>
-                  </li>
-                  <li>
-                    <a href="#">helm</a>
-                  </li>
+                  {% endfor %}
                 </ul>
               </div>
-              <div class="col-lg-6">
+              <!-- <div class="col-lg-6">
                 <ul class="list-unstyled mb-0">
                   <li>
                     <a href="#">python</a>
@@ -63,7 +59,7 @@
                     <a href="#">esp32</a>
                   </li>
                 </ul>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
