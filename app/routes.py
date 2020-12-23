@@ -4,8 +4,8 @@ from flask import render_template
 from flask import redirect
 from flask import abort
 
+from datetime import datetime
 from slugify import slugify
-
 from app import app
 
 import markdown
@@ -32,13 +32,16 @@ def post(any, mes, slug):
                 md_file = os.path.join(path, filename)
                 with open(md_file, 'r') as reader:
                     md_data = reader.read()
-
-                    md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-                    post_html = md.convert(md_data)
-                    post_metadata = md.Meta
-                    page_url = '/'+any+'/'+mes+'/'+filename_slug
-                    return render_template('post.html', single=True, post_html=post_html, post_metadata=post_metadata, page_url=page_url)
-
+                    try:
+                        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+                        post_html = md.convert(md_data)
+                        post_metadata = md.Meta
+                        page_url = '/'+any+'/'+mes+'/'+filename_slug
+                        if md.Meta['status'][0]=='published':
+                            return render_template('post.html', single=True, post_html=post_html, post_metadata=post_metadata, page_url=page_url)
+                        break
+                    except:
+                        break
     abort(404)
 
 @app.route('/about')
@@ -66,7 +69,7 @@ def index():
 
                 excerpt = ''
                 for line in lines:
-                    if line == '<!-- more -->\n':
+                    if re.match(r'^<!--.*-->$', line):
                         break
                     excerpt += line
 
@@ -76,7 +79,17 @@ def index():
                 post['meta'] = md.Meta
                 post['excerpt'] = re.sub(r'<h1>.*</h1>', '', excerpt_html)
 
-                posts.append(post)
+                try:
+                    # do not show drafts
+                    if md.Meta['status'][0]=='published':
+                        post_date = datetime.strptime(md.Meta['date'][0], '%d/%m/%Y')
+                        date_now  = datetime.now()
+
+                        # auto-publish
+                        if post_date < date_now:
+                            posts.append(post)
+                except:
+                    pass
 
     return render_template('index.html', single=False, posts=posts, post_metadata=post_metadata, page_url='https://pet2cattle.com')
 
