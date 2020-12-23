@@ -26,7 +26,7 @@ def post(any, mes, slug):
             if not re.match(r'[0-9]+ ', filename):
                 # when the filename does not start with a number it's a draft - skipping it
                 continue
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', filename))
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', filename)))
 
             if slug==filename_slug:
                 md_file = os.path.join(path, filename)
@@ -59,7 +59,7 @@ def index():
                 continue
 
             md_file = os.path.join(path, filename)
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', filename))
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', filename)))
             with open(md_file, 'r') as reader:
                 post = {}
                 lines = reader.readlines(10000)
