@@ -12,6 +12,9 @@ import markdown
 import re
 import os
 
+# global settings
+MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', None)
+MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', None)
 
 md = Markdown(app,
               extensions=['meta'],
