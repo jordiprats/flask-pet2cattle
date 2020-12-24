@@ -1,6 +1,7 @@
 from flaskext.markdown import Markdown
 from flask import send_from_directory
 from flask import render_template
+from flask import make_response
 from flask import redirect
 from flask import abort
 
@@ -21,6 +22,16 @@ md = Markdown(app,
               safe_mode=True,
               output_format='html4',
              )
+
+@app.route('/robots.txt')
+def robots():
+    lines = [
+        "User-Agent: *",
+        "Disallow: /wp-admin/",
+    ]
+    response = make_response("\n".join(lines), 200)
+    response.mimetype = "text/plain"
+    return response
 
 @app.route('/<any>/<mes>/<slug>')
 def post(any, mes, slug):
