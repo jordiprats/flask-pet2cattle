@@ -134,8 +134,6 @@ class Post:
 
         response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+year+'/'+month, MaxKeys=1000)
 
-        print(str(response))
-
         if not 'Contents' in response.keys():
             return []
 
