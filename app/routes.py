@@ -7,6 +7,8 @@ from flask import abort
 
 from datetime import datetime
 from slugify import slugify
+
+from app import models
 from app import app
 
 import markdown
@@ -29,40 +31,21 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
-@app.route('/<any>/<mes>/<slug>')
-def post(any, mes, slug):
-    for path, dirnames, filenames in sorted(os.walk(os.path.join('app', 'posts', any, mes))):
-        for filename in filenames:
-            if not re.match(r'[0-9]+ ', filename):
-                # when the filename does not start with a number it's a draft - skipping it
-                continue
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', filename)))
+@app.route('/<year>/<mes>/<slug>')
+def post(year, mes, slug):
 
-            if slug==filename_slug:
-                md_file = os.path.join(path, filename)
-                with open(md_file, 'r') as reader:
-                    md_data = reader.read()
-                    try:
-                        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-                        post_html = md.convert(md_data)
-                        post_metadata = md.Meta
-                        page_url = '/'+any+'/'+mes+'/'+filename_slug
-                        try:
-                            keywords = []
-                            for keyword in md.Meta['keywords'][0].split(','):
-                                keywords.append(keyword.strip())
-                        except:
-                            keywords = []
-                        if md.Meta['status'][0]=='published':
-                            return render_template('post.html', 
-                                                                single=True, 
-                                                                post_html=post_html, 
-                                                                post_metadata=post_metadata, 
-                                                                page_url=page_url, 
-                                                                keywords=keywords)
-                        break
-                    except:
-                        break
+    try:
+        post = models.Post.filter(year, mes, slug)[0]
+        if post.is_published():
+            return render_template('post.html',
+                                                single=True, 
+                                                post_html=post.html, 
+                                                post_metadata=post.metadata, 
+                                                page_url=post.url, 
+                                                keywords=post.get_keywords()
+                                    )
+    except:
+        pass
     abort(404)
 
 @app.route('/about')
