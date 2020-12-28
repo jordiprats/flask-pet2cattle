@@ -15,11 +15,18 @@
             <li style="margin-top: 30px;">
                 <h2><a style="color: black;" href="{{ post.url }}">{{ post.get_title() }}</a></h2>
                 {{ post.get_excerpt() | safe }}
-                <p class="text-secondary float-right" >{{ post.print_date() }}</p>
+                <p class="text-secondary float-right" >{{ post.get_print_date() }}</p>
                 <a href="{{ post.url }}">Read more...</a>
             </li>
         {% endfor %}
         </ul>
+
+          {% if has_previous %}
+          <p class="float-left" ><a href="/page/{{ page_number-1 }}">More recent...</a></p>
+          {% endif %}
+          {% if has_next %}
+          <p class="float-right" ><a href="/page/{{ page_number+1 }}">Older content...</a></p>
+          {% endif %}
 
       </div>
 

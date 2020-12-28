@@ -5,6 +5,7 @@ from slugify import slugify
 
 import markdown
 import boto3
+import math
 import re
 import os
 import io
@@ -102,10 +103,6 @@ class Post:
         count=0
         get_key_value = lambda obj: obj['Key']
         for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
-            if count<page*limit:
-                count += 1
-                continue
-
             if count >=(page*limit)+limit:
                 break
 
@@ -118,13 +115,18 @@ class Post:
             post = Post(url, response['Body'].read().decode('utf-8'))
 
             if post.is_published():
+                if count<page*limit:
+                    count += 1
+                    continue
                 posts.append(post)
                 count += 1
 
-        return posts
+        data = {}
+        data['Posts'] = posts
+        data['page'] = math.ceil((count/5.0)-1)
+        data['next'] = count >=(page*limit)+limit
 
-
-
+        return data
 
     def filter(year, month, slug):
         global MINIO_BUCKET

@@ -58,13 +58,21 @@ def index(page):
     page_metadata['title']=['From pet to cattle']
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
-    posts = models.Post.all(int(page), 5)
+    response = models.Post.all(int(page), 5)
 
-    if len(posts)==0:
+    if len(response['Posts'])==0:
         abort(404)
 
-    print(str(posts))
-    return render_template('index.html', single=False, posts=posts, post_metadata=page_metadata, page_url='https://pet2cattle.com')
+    print(str(response))
+    return render_template('index.html', 
+                                        single=False,
+                                        posts=response['Posts'], 
+                                        post_metadata=page_metadata, 
+                                        page_url='https://pet2cattle.com',
+                                        page_number=response['page'],
+                                        has_next=response['next'],
+                                        has_previous=response['page']>0,
+                                    )
 
 @app.route('/<path:path>')
 def catch_all(path):
