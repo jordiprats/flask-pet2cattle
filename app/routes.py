@@ -63,7 +63,6 @@ def index(page):
     if len(response['Posts'])==0:
         abort(404)
 
-    print(str(response))
     return render_template('index.html', 
                                         single=False,
                                         posts=response['Posts'], 
