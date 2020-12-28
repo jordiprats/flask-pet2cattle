@@ -7,6 +7,7 @@ import markdown
 import boto3
 import re
 import os
+import io
 
 # global settings
 MINIO_URL        = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
@@ -32,18 +33,23 @@ class Post:
     url = None
     html = None
     metadata = None
+    raw_md = None
 
     def __init__(self, url, raw_md):
+        self.raw_md = raw_md
         md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.url = url
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
 
     def is_published(self):
-        if self.metadata['status'][0]=='published':
-            date_now  = datetime.now()
-            if self.publish_date() < date_now:
-                return True
+        try:
+            if self.metadata['status'][0]=='published':
+                date_now  = datetime.now()
+                if self.publish_date() < date_now:
+                    return True
+        except:
+            pass
         return False
 
     def publish_date(self):
@@ -58,11 +64,69 @@ class Post:
         except:
             return []
 
+    def get_excerpt(self):
+        buf = io.StringIO(self.raw_md)
+        lines = buf.readlines(10000)
+
+        excerpt = ''
+        for line in lines:
+            if re.match(r'^<!--.*-->$', line):
+                break
+            excerpt += line
+
+        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+        excerpt_html = md.convert(excerpt)
+
+        return re.sub(r'<h1>.*</h1>', '', excerpt_html)
+
+    def get_title(self):
+        return self.metadata['title'][0]
+
+
+    def __repr__(self):
+        return self.url
+    
+    def __str__(self):
+        return self.url
+
+    def all(page=0, limit=5):
+        global MINIO_BUCKET
+        init_s3_client()
+
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts', MaxKeys=1000)
+
+        posts = []
+        count=0
+        get_key_value = lambda obj: obj['Key']
+        for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
+            if count<page*limit:
+                count += 1
+                continue
+
+            if count >(page*limit)+limit:
+                break
+
+            base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
+            if not base_url:
+                continue
+            url = base_url.groups()[0] + slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', re.sub(r'^posts/[0-9]+/[0-9]+/', '', bucket_object['Key']))))
+
+            response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
+            post = Post(url, response['Body'].read().decode('utf-8'))
+
+            if post.is_published():
+                posts.append(post)
+
+        return posts
+
+
+
+
     def filter(year, month, slug):
         global MINIO_BUCKET
         init_s3_client()
 
-        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+year+'/'+month, MaxKeys=100)
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+year+'/'+month, MaxKeys=1000)
 
         print(str(response))
 

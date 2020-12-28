@@ -53,9 +53,16 @@ def about():
 
 @app.route('/')
 def index():
-    post_metadata={}
-    post_metadata['title']=['From pet to cattle']
-    post_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
+    page_metadata={}
+    page_metadata['title']=['From pet to cattle']
+    page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
+
+    posts = models.Post.all()
+
+    print(str(posts))
+
+    return render_template('index.html', single=False, posts=posts, post_metadata=page_metadata, page_url='https://pet2cattle.com')
+
     posts = []
     for path, dirnames, filenames in os.walk('app/posts'):
         for filename in sorted(filenames, reverse=True):
@@ -94,7 +101,7 @@ def index():
                 except:
                     pass
 
-    return render_template('index.html', single=False, posts=posts, post_metadata=post_metadata, page_url='https://pet2cattle.com')
+    return render_template('index.html', single=False, posts=posts, post_metadata=page_metadata, page_url='https://pet2cattle.com')
 
 @app.route('/<path:path>')
 def catch_all(path):

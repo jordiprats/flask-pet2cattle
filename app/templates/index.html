@@ -13,10 +13,10 @@
         <ul>
         {% for post in posts %}
             <li style="margin-top: 30px;">
-                <h2><a style="color: black;" href="{{ post['url'] }}">{{ post['meta']['title'][0] }}</a></h2>
-                {{ post['excerpt'] | safe }}
-                <p class="text-secondary float-right" >{{ post['meta']['date'][0] }}</p>
-                <a href="{{ post['url'] }}">Read more...</a>
+                <h2><a style="color: black;" href="{{ post.url }}">{{ post.get_title() }}</a></h2>
+                {{ post.get_excerpt() | safe }}
+                <p class="text-secondary float-right" >{{ post.publish_date() }}</p>
+                <a href="{{ post.url }}">Read more...</a>
             </li>
         {% endfor %}
         </ul>
