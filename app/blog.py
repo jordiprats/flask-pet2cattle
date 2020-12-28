@@ -1,4 +1,7 @@
+
 from flaskext.markdown import Markdown
+from flask_caching import Cache
+
 from flask import send_from_directory
 from flask import render_template
 from flask import make_response
@@ -15,6 +18,16 @@ import markdown
 import re
 import os
 
+config = {
+    "DEBUG": False,          # some Flask specific configs
+    "CACHE_TYPE": "filesystem", # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300,
+    'CACHE_DIR': 'cache'
+}
+
+app.config.from_mapping(config)
+cache = Cache(app)
+
 md = Markdown(app,
               extensions=['meta'],
               safe_mode=True,
@@ -22,6 +35,7 @@ md = Markdown(app,
              )
 
 @app.route('/robots.txt')
+@cache.cached(timeout=3600)
 def robots():
     lines = [
         "User-Agent: *",
@@ -32,6 +46,7 @@ def robots():
     return response
 
 @app.route('/<year>/<month>/<slug>')
+@cache.cached(timeout=3600)
 def post(year, month, slug):
     try:
         post = models.Post.filter(int(year), int(month), slug)[0]
@@ -53,6 +68,7 @@ def about():
 
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<page>')
+@cache.cached(timeout=3600)
 def index(page):
     page_metadata={}
     page_metadata['title']=['From pet to cattle']

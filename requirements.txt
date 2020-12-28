@@ -1,4 +1,5 @@
 flask
+boto3
+Flask-Caching
 Flask-Markdown
 python-slugify
-boto3
