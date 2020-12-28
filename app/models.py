@@ -54,6 +54,9 @@ class Post:
 
     def publish_date(self):
         return datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
+    
+    def get_print_date(self):
+        return self.metadata['date'][0]
 
     def get_keywords(self):
         try:
@@ -103,7 +106,7 @@ class Post:
                 count += 1
                 continue
 
-            if count >(page*limit)+limit:
+            if count >=(page*limit)+limit:
                 break
 
             base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
@@ -116,6 +119,7 @@ class Post:
 
             if post.is_published():
                 posts.append(post)
+                count += 1
 
         return posts
 
