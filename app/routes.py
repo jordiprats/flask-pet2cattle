@@ -63,46 +63,6 @@ def index():
 
     return render_template('index.html', single=False, posts=posts, post_metadata=page_metadata, page_url='https://pet2cattle.com')
 
-    posts = []
-    for path, dirnames, filenames in os.walk('app/posts'):
-        for filename in sorted(filenames, reverse=True):
-            print(filename)
-            if not re.match(r'[0-9]+ ', filename):
-                # when the filename does not start with a number it's a draft - skipping it
-                continue
-
-            md_file = os.path.join(path, filename)
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', filename)))
-            with open(md_file, 'r') as reader:
-                post = {}
-                lines = reader.readlines(10000)
-
-                excerpt = ''
-                for line in lines:
-                    if re.match(r'^<!--.*-->$', line):
-                        break
-                    excerpt += line
-
-                md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-                excerpt_html = md.convert(excerpt)
-                post['url'] = re.sub('app/posts', '', path)+'/'+filename_slug
-                post['meta'] = md.Meta
-                post['excerpt'] = re.sub(r'<h1>.*</h1>', '', excerpt_html)
-
-                try:
-                    # do not show drafts
-                    if md.Meta['status'][0]=='published':
-                        post_date = datetime.strptime(md.Meta['date'][0], '%d/%m/%Y')
-                        date_now  = datetime.now()
-
-                        # auto-publish
-                        if post_date < date_now:
-                            posts.append(post)
-                except:
-                    pass
-
-    return render_template('index.html', single=False, posts=posts, post_metadata=page_metadata, page_url='https://pet2cattle.com')
-
 @app.route('/<path:path>')
 def catch_all(path):
     abort(404)
