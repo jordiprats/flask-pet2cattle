@@ -33,7 +33,6 @@ def robots():
 
 @app.route('/<year>/<mes>/<slug>')
 def post(year, mes, slug):
-
     try:
         post = models.Post.filter(year, mes, slug)[0]
         if post.is_published():
