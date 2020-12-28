@@ -31,10 +31,10 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
-@app.route('/<year>/<mes>/<slug>')
-def post(year, mes, slug):
+@app.route('/<year>/<month>/<slug>')
+def post(year, month, slug):
     try:
-        post = models.Post.filter(year, mes, slug)[0]
+        post = models.Post.filter(int(year), int(month), slug)[0]
         if post.is_published():
             return render_template('post.html',
                                                 single=True, 

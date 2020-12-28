@@ -132,13 +132,13 @@ class Post:
         global MINIO_BUCKET
         init_s3_client()
 
-        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+year+'/'+month, MaxKeys=1000)
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+str(year)+'/'+str(month), MaxKeys=1000)
 
         if not 'Contents' in response.keys():
             return []
 
         for bucket_object in response['Contents']:
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', bucket_object['Key'].lstrip('posts/'+year+'/'+month+'/'))))
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', bucket_object['Key'].lstrip('posts/'+str(year)+'/'+str(month)+'/'))))
 
             if slug == filename_slug:
                 response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
