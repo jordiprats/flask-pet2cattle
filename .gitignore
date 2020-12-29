@@ -3,3 +3,4 @@
 *.py[cod]
 __pycache__/
 cache/
+!cache/.gitkeep
