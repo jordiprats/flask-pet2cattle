@@ -2,3 +2,4 @@
 *.pot
 *.py[cod]
 __pycache__/
+cache/

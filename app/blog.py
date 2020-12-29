@@ -49,7 +49,7 @@ def robots():
 @cache.cached(timeout=3600)
 def post(year, month, slug):
     try:
-        post = models.Post.filter(int(year), int(month), slug)[0]
+        post = models.Post.filter(re.sub(r'[^0-9]', '', year), re.sub(r'[^0-9]', '', month), slug)[0]
         if post.is_published():
             return render_template('post.html',
                                                 single=True, 
