@@ -59,7 +59,14 @@ class Post:
         return False
 
     def publish_date(self):
-        return datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
+        try:
+            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
+        except:
+            try:
+                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y')
+            except:
+                return None
+        return date
     
     def get_print_date(self):
         return self.metadata['date'][0]
