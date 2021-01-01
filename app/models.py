@@ -136,7 +136,7 @@ class Post:
         data = {}
         data['Posts'] = posts
         data['page'] = math.ceil((count/5.0)-1)
-        data['next'] = count >=(page*limit)+limit
+        data['next'] = count >(page*limit)+limit
 
         return data
 
