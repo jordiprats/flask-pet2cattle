@@ -150,6 +150,7 @@ class Post(S3File):
         get_key_value = lambda obj: obj['Key']
         for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
             if limit>=0 and count >=(page*limit)+limit:
+                # count + 1? 
                 break
 
             base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
