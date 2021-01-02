@@ -142,6 +142,7 @@ class Post(S3File):
         global MINIO_BUCKET, s3_client
         init_s3_client()
 
+        # TODO: arreglar limit de 1000 objectes
         response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts', MaxKeys=1000)
 
         posts = []
