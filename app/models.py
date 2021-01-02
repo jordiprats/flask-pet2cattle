@@ -44,6 +44,13 @@ class S3File:
         self.base_object = base_object
         self.url = url
         self.last_modified = last_modified
+    
+    def get_data(self):
+        global MINIO_BUCKET, s3_client
+        init_s3_client()
+
+        return s3_client.get_object(Bucket=MINIO_BUCKET, Key=self.base_object+'/'+self.url)['Body']
+
 
 class Sitemap(S3File):
     filehandle = None
@@ -53,7 +60,6 @@ class Sitemap(S3File):
     
     def save(self):
         global MINIO_BUCKET, s3_client
-
         init_s3_client()
 
         response = s3_client.put_object(
@@ -154,7 +160,7 @@ class Post(S3File):
             post = Post(url, response['Body'].read().decode('utf-8'), response['LastModified'])
 
             if post.is_published():
-                if limit>=0 or count<page*limit:
+                if limit>=0 and count<page*limit:
                     count += 1
                     continue
                 posts.append(post)

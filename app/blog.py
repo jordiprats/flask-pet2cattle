@@ -35,6 +35,19 @@ md = Markdown(app,
               output_format='html4',
              )
 
+@app.route('/sitemap<sitemap_name>')
+@cache.cached(timeout=3600)
+def sitemap(sitemap_name):
+    try:
+        response = make_response(models.Sitemap('sitemap'+sitemap_name, None, None).get_data().read(), 200)
+        if re.match(r'\.gz$', sitemap_name):
+            response.mimetype = "application/x-gzip"
+        else:
+            response.mimetype = "application/xml"
+        return response
+    except:
+        abort(404)
+
 @app.route('/robots.txt')
 @cache.cached(timeout=3600)
 def robots():
@@ -78,6 +91,7 @@ def index(page):
     response = models.Post.all(int(page), 5)
 
     if len(response['Posts'])==0:
+        print('empty')
         abort(404)
 
     return render_template('index.html', 
