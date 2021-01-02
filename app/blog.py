@@ -15,6 +15,7 @@ from app import models
 from app import app
 
 import markdown
+import yaml
 import re
 import os
 
@@ -105,5 +106,19 @@ def index(page):
                                     )
 
 @app.route('/<path:path>')
+@cache.cached(timeout=3600)
 def catch_all(path):
+    try:
+        redirects_302 = cache.get('redirects_302')
+        if not redirects_302:
+            redirects_302 = yaml.safe_load(models.S3File('redirects', '302.yaml').get_data())
+        
+        try:
+            return redirect(redirects_302['redirect'][path], code=302)
+        except:
+            pass
+
+    except Exception as e:
+        print(str(e))
+        pass
     abort(404)

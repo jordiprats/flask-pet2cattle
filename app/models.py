@@ -40,7 +40,7 @@ class S3File:
     url = None
     last_modified = None
 
-    def __init__(self, base_object, url, last_modified):
+    def __init__(self, base_object, url, last_modified=None):
         self.base_object = base_object
         self.url = url
         self.last_modified = last_modified
