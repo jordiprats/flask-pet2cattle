@@ -3,3 +3,4 @@ boto3
 Flask-Caching
 Flask-Markdown
 python-slugify
+PyYAML
