@@ -27,6 +27,7 @@ config = {
 
 app.config.from_mapping(config)
 cache = Cache(app)
+cache.clear()
 
 md = Markdown(app,
               extensions=['meta'],

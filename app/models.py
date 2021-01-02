@@ -12,7 +12,7 @@ import io
 
 # global settings
 MINIO_URL        = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
-MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'demo')
+MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'pet2cattle')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'AKIAIOSFODNN7EXAMPLE')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
 
@@ -40,13 +40,15 @@ class Post:
     html = None
     metadata = None
     raw_md = None
+    last_modified = None
 
-    def __init__(self, url, raw_md):
+    def __init__(self, url, raw_md, last_modified):
         self.raw_md = raw_md
         md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.url = url
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
+        self.last_modified = last_modified
 
     def is_published(self):
         try:
@@ -115,7 +117,7 @@ class Post:
         count=0
         get_key_value = lambda obj: obj['Key']
         for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
-            if count >=(page*limit)+limit:
+            if limit>=0 and count >=(page*limit)+limit:
                 break
 
             base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
@@ -124,10 +126,10 @@ class Post:
             url = base_url.groups()[0] + slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', re.sub(r'^posts/[0-9]+/[0-9]+/', '', bucket_object['Key']))))
 
             response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
-            post = Post(url, response['Body'].read().decode('utf-8'))
+            post = Post(url, response['Body'].read().decode('utf-8'), response['LastModified'])
 
             if post.is_published():
-                if count<page*limit:
+                if limit>=0 or count<page*limit:
                     count += 1
                     continue
                 posts.append(post)
@@ -136,7 +138,7 @@ class Post:
         data = {}
         data['Posts'] = posts
         data['page'] = math.ceil((count/5.0)-1)
-        data['next'] = count >(page*limit)+limit
+        data['next'] = limit>=0 and count >(page*limit)+limit
 
         return data
 
@@ -155,6 +157,6 @@ class Post:
             if slug == filename_slug:
                 response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
 
-                return [ Post('/'+year+'/'+month+'/'+slug, response['Body'].read().decode('utf-8')) ]
+                return [ Post('/'+year+'/'+month+'/'+slug, response['Body'].read().decode('utf-8'), response['LastModified']) ]
 
         return []
