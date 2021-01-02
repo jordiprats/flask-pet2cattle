@@ -77,10 +77,6 @@ def post(year, month, slug):
         pass
     abort(404)
 
-@app.route('/about')
-def about():
-    return redirect('https://github.com/jordiprats', code=302)
-
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<page>')
 @cache.cached(timeout=3600)
