@@ -35,20 +35,45 @@ def init_s3_client():
             print("ERROR: unable to connect to bucket")
             raise Exception('unable to connect to bucket')
 
-class Post:
+class S3File:
+    base_object = None
     url = None
+    last_modified = None
+
+    def __init__(self, base_object, url, last_modified):
+        self.base_object = base_object
+        self.url = url
+        self.last_modified = last_modified
+
+class Sitemap(S3File):
+    filehandle = None
+    def __init__(self, url, last_modified, filehandle):
+        super().__init__('sitemaps', url, last_modified)
+        self.filehandle = filehandle
+    
+    def save(self):
+        global MINIO_BUCKET, s3_client
+
+        init_s3_client()
+
+        response = s3_client.put_object(
+                                            Body=self.filehandle,
+                                            Bucket=MINIO_BUCKET,
+                                            Key=self.base_object+'/'+self.url
+                                        )
+
+
+class Post(S3File):
     html = None
     metadata = None
     raw_md = None
-    last_modified = None
 
     def __init__(self, url, raw_md, last_modified):
+        super().__init__('posts', url, last_modified)
         self.raw_md = raw_md
         md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-        self.url = url
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
-        self.last_modified = last_modified
 
     def is_published(self):
         try:
@@ -108,7 +133,7 @@ class Post:
         return self.url
 
     def all(page=0, limit=5):
-        global MINIO_BUCKET
+        global MINIO_BUCKET, s3_client
         init_s3_client()
 
         response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts', MaxKeys=1000)
@@ -143,7 +168,7 @@ class Post:
         return data
 
     def filter(year, month, slug):
-        global MINIO_BUCKET
+        global MINIO_BUCKET, s3_client
         init_s3_client()
 
         response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+str(year)+'/'+str(month), MaxKeys=1000)
