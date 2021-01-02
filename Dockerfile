@@ -8,6 +8,7 @@ RUN pip install gunicorn
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY app /code/app
+COPY sitemapgen.py .
 
 EXPOSE 8000
 
