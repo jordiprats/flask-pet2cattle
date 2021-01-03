@@ -172,10 +172,8 @@ class Post(S3File):
                 posts.append(post)
                 count += 1
 
-        
         data['Posts'] = posts
         data['page'] = math.ceil((count/5.0)-1)
-        
 
         return data
 
