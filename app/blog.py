@@ -134,9 +134,9 @@ def index(page):
                                         post_metadata=page_metadata, 
                                         page_url='https://pet2cattle.com',
                                         pagination_prefix='/',
-                                        page_number=response['page'],
+                                        page_number=page,
                                         has_next=response['next'],
-                                        has_previous=response['page']>0,
+                                        has_previous=page>0,
                                     )
 
 @app.route('/<path:path>')
