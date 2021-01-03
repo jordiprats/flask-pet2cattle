@@ -54,7 +54,7 @@ def sitemap(sitemap_name):
 def robots():
     lines = [
         "User-Agent: *",
-        "Disallow: /wp-admin/",
+        "Allow: /",
     ]
     response = make_response("\n".join(lines), 200)
     response.mimetype = "text/plain"
