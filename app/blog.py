@@ -55,6 +55,9 @@ def robots():
     lines = [
         "User-Agent: *",
         "Allow: /",
+        "",
+        "Sitemap: http://pet2cattle.com/sitemap.xml",
+        ""
     ]
     response = make_response("\n".join(lines), 200)
     response.mimetype = "text/plain"
