@@ -142,6 +142,9 @@ class Post(S3File):
         global MINIO_BUCKET, s3_client
         init_s3_client()
 
+        data = {}
+        data['next'] = False
+
         # TODO: arreglar limit de 1000 objectes
         response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts', MaxKeys=1000)
 
@@ -149,9 +152,6 @@ class Post(S3File):
         count=0
         get_key_value = lambda obj: obj['Key']
         for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
-            if limit>=0 and count >=(page*limit)+limit:
-                # count + 1? 
-                break
 
             base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
             if not base_url:
@@ -162,16 +162,20 @@ class Post(S3File):
             post = Post(url, response['Body'].read().decode('utf-8'), response['LastModified'])
 
             if post.is_published():
+                if limit>=0 and count >=(page*limit)+limit:
+                    # N+1 for checking next whether there are more posts
+                    data['next'] = True
+                    break
                 if limit>=0 and count<page*limit:
                     count += 1
                     continue
                 posts.append(post)
                 count += 1
 
-        data = {}
+        
         data['Posts'] = posts
         data['page'] = math.ceil((count/5.0)-1)
-        data['next'] = limit>=0 and count >(page*limit)+limit
+        
 
         return data
 
