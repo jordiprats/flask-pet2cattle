@@ -63,6 +63,40 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
+@app.route('/<year>/page/<int:page>', defaults={'month': None})
+@app.route('/<year>/', defaults={'month': None, 'page': 0})
+@app.route('/<year>/<month>/page/<int:page>')
+@app.route('/<year>/<month>/', defaults={'page': 0})
+@cache.cached(timeout=3600)
+def archives(year, month, page):
+    page_metadata={}
+    page_metadata['title']=['Archives: From pet to cattle']
+    page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
+
+    if month:
+        limit = -1
+        prefix = '/'+re.sub(r'[^0-9]', '', year)+'/'+re.sub(r'[^0-9]', '', month)
+    else:
+        prefix = '/'+re.sub(r'[^0-9]', '', year)
+        limit = 5
+
+    response = models.Post.all(page=page, limit=limit, prefix=prefix)
+
+    if len(response['Posts'])==0:
+        print('empty')
+        abort(404)
+
+    return render_template('index.html', 
+                                        single=False,
+                                        posts=response['Posts'], 
+                                        post_metadata=page_metadata, 
+                                        page_url='https://pet2cattle.com',
+                                        pagination_prefix=prefix+'/',
+                                        page_number=response['page'],
+                                        has_next=response['next'],
+                                        has_previous=response['page']>0,
+                                    )
+
 @app.route('/<year>/<month>/<slug>')
 @cache.cached(timeout=3600)
 def post(year, month, slug):
@@ -81,14 +115,14 @@ def post(year, month, slug):
     abort(404)
 
 @app.route('/', defaults={'page': 0})
-@app.route('/page/<page>')
+@app.route('/page/<int:page>')
 @cache.cached(timeout=3600)
 def index(page):
     page_metadata={}
     page_metadata['title']=['From pet to cattle']
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
-    response = models.Post.all(int(page), 5)
+    response = models.Post.all(page, 5)
 
     if len(response['Posts'])==0:
         print('empty')
@@ -99,6 +133,7 @@ def index(page):
                                         posts=response['Posts'], 
                                         post_metadata=page_metadata, 
                                         page_url='https://pet2cattle.com',
+                                        pagination_prefix='/',
                                         page_number=response['page'],
                                         has_next=response['next'],
                                         has_previous=response['page']>0,

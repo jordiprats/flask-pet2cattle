@@ -138,15 +138,20 @@ class Post(S3File):
     def __str__(self):
         return self.url
 
-    def all(page=0, limit=5):
+    def all(page=0, limit=5, prefix=None):
         global MINIO_BUCKET, s3_client
         init_s3_client()
+
+        if prefix:
+            s3_prefix = 'posts'+prefix
+        else:
+            s3_prefix = 'posts'
 
         data = {}
         data['next'] = False
 
         # TODO: arreglar limit de 1000 objectes
-        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts', MaxKeys=1000)
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=s3_prefix, MaxKeys=1000)
 
         posts = []
         count=0

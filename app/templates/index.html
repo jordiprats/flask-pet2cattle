@@ -25,13 +25,13 @@
 
           {% if has_previous %}
           {% if page_number-1 == 0 %}
-          <p class="float-left" ><a href="/">More recent...</a></p>
+          <p class="float-left" ><a href="{{ pagination_prefix }}">More recent...</a></p>
           {% else %}
-          <p class="float-left" ><a href="/page/{{ page_number-1 }}">More recent...</a></p>
+          <p class="float-left" ><a href="{{ pagination_prefix }}page/{{ page_number-1 }}">More recent...</a></p>
           {% endif %}
           {% endif %}
           {% if has_next %}
-          <p class="float-right" ><a href="/page/{{ page_number+1 }}">Older content...</a></p>
+          <p class="float-right" ><a href="{{ pagination_prefix }}page/{{ page_number+1 }}">Older content...</a></p>
           {% endif %}
 
       </div>
