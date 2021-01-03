@@ -74,11 +74,11 @@ def archives(year, month, page):
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
     if month:
-        limit = -1
+        limit = 10
         prefix = '/'+re.sub(r'[^0-9]', '', year)+'/'+re.sub(r'[^0-9]', '', month)
     else:
         prefix = '/'+re.sub(r'[^0-9]', '', year)
-        limit = 5
+        limit = 15
 
     response = models.Post.all(page=page, limit=limit, prefix=prefix)
 
@@ -92,9 +92,9 @@ def archives(year, month, page):
                                         post_metadata=page_metadata, 
                                         page_url='https://pet2cattle.com',
                                         pagination_prefix=prefix+'/',
-                                        page_number=response['page'],
+                                        page_number=page,
                                         has_next=response['next'],
-                                        has_previous=response['page']>0,
+                                        has_previous=page>0,
                                     )
 
 @app.route('/<year>/<month>/<slug>')
