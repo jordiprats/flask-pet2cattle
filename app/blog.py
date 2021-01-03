@@ -19,6 +19,11 @@ import yaml
 import re
 import os
 
+if os.getenv('DEBUG', False):
+    DEBUG=True
+else:
+    DEBUG=False
+
 config = {
     "DEBUG": False,          # some Flask specific configs
     "CACHE_TYPE": "filesystem", # Flask-Caching related configs
@@ -39,6 +44,8 @@ md = Markdown(app,
 @app.route('/sitemap<sitemap_name>')
 @cache.cached(timeout=3600)
 def sitemap(sitemap_name):
+    if DEBUG:
+        print('sitemap')
     try:
         response = make_response(models.Sitemap('sitemap'+sitemap_name, None, None).get_data().read(), 200)
         if re.match(r'\.gz$', sitemap_name):
@@ -52,6 +59,8 @@ def sitemap(sitemap_name):
 @app.route('/robots.txt')
 @cache.cached(timeout=3600)
 def robots():
+    if DEBUG:
+        print('robots')
     lines = [
         "User-Agent: *",
         "Allow: /",
@@ -63,21 +72,23 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
-@app.route('/<year>/page/<int:page>', defaults={'month': None})
-@app.route('/<year>/', defaults={'month': None, 'page': 0})
-@app.route('/<year>/<month>/page/<int:page>')
-@app.route('/<year>/<month>/', defaults={'page': 0})
+@app.route('/<int:year>/page/<int:page>', defaults={'month': None})
+@app.route('/<int:year>/', defaults={'month': None, 'page': 0})
+@app.route('/<int:year>/<month>/page/<int:page>')
+@app.route('/<int:year>/<month>/', defaults={'page': 0})
 @cache.cached(timeout=3600)
 def archives(year, month, page):
+    if DEBUG:
+        print('archives')
     page_metadata={}
     page_metadata['title']=['Archives: From pet to cattle']
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
     if month:
         limit = 10
-        prefix = '/'+re.sub(r'[^0-9]', '', year)+'/'+re.sub(r'[^0-9]', '', month)
+        prefix = '/'+str(year)+'/'+re.sub(r'[^0-9]', '', month)
     else:
-        prefix = '/'+re.sub(r'[^0-9]', '', year)
+        prefix = '/'+str(year)
         limit = 15
 
     response = models.Post.all(page=page, limit=limit, prefix=prefix)
@@ -97,11 +108,13 @@ def archives(year, month, page):
                                         has_previous=page>0,
                                     )
 
-@app.route('/<year>/<month>/<slug>')
+@app.route('/<int:year>/<month>/<slug>')
 @cache.cached(timeout=3600)
 def post(year, month, slug):
+    if DEBUG:
+        print('post')
     try:
-        post = models.Post.filter(re.sub(r'[^0-9]', '', year), re.sub(r'[^0-9]', '', month), slug)[0]
+        post = models.Post.filter(str(year), re.sub(r'[^0-9]', '', month), slug)[0]
         if post.is_published():
             return render_template('post.html',
                                                 single=True, 
@@ -118,6 +131,8 @@ def post(year, month, slug):
 @app.route('/page/<int:page>')
 @cache.cached(timeout=3600)
 def index(page):
+    if DEBUG:
+        print('index')
     page_metadata={}
     page_metadata['title']=['From pet to cattle']
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
