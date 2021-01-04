@@ -81,6 +81,7 @@ def archives(year, month, page):
     if DEBUG:
         print('archives')
     page_metadata={}
+    page_metadata['robots']='noindex,follow'
     page_metadata['title']=['Archives: From pet to cattle']
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
@@ -135,6 +136,8 @@ def index(page):
         print('index')
     page_metadata={}
     page_metadata['title']=['From pet to cattle']
+    if page!=0:
+        page_metadata['robots']='noindex,follow'
     page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
 
     response = models.Post.all(page, 5)

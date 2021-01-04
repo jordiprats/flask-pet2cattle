@@ -9,6 +9,12 @@
   <meta name="copyright" content="Copyright (c) Jordi Prats">
   <meta name="description" content="">
 
+  {% if post_metadata['robots'] %}
+  <META NAME="Robots" CONTENT="{{ post_metadata['robots'] }}" />
+  {% else %}
+  <META NAME="Robots" CONTENT="index,follow" />
+  {% endif %}
+
 	<meta name="keywords" content="{{ post_metadata['keywords'][0] }}">  
 
   <meta property="og:title" content="{{ post_metadata['title'][0] }}">
@@ -33,7 +39,7 @@ pre {
   {% if post_html %}
   <title>{{ post_metadata['title'][0] }} | from pet to cattle</title>
   {% else %}
-  <title>From pet to cattle</title>
+  <title>{{ post_metadata['title'][0] }}</title>
   {% endif %}
 
   <!-- Bootstrap core CSS -->
