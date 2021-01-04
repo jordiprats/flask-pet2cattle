@@ -5,6 +5,7 @@ from slugify import slugify
 
 import markdown
 import boto3
+import pytz
 import math
 import re
 import os
@@ -101,10 +102,10 @@ class Post(S3File):
 
     def publish_date(self):
         try:
-            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y').replace(tzinfo=utc)
+            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y').replace(tzinfo=pytz.UTC)
         except:
             try:
-                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y').replace(tzinfo=utc)
+                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y').replace(tzinfo=pytz.UTC)
             except:
                 return None
         return date
