@@ -101,10 +101,10 @@ class Post(S3File):
 
     def publish_date(self):
         try:
-            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
+            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y').replace(tzinfo=utc)
         except:
             try:
-                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y')
+                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y').replace(tzinfo=utc)
             except:
                 return None
         return date
