@@ -95,18 +95,20 @@ class Post(S3File):
     def get_last_modified(self):
         publish_date = self.publish_date()
 
-        if not publish_date or self.last_modified > publish_date:
+        if not publish_date or self.last_modified > publish_date.replace(tzinfo=pytz.UTC):
             return self.last_modified
         else:
             return publish_date
 
     def publish_date(self):
         try:
-            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y').replace(tzinfo=pytz.UTC)
-        except:
+            date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
+        except Exception as e:
+            print(str(e))
             try:
-                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y').replace(tzinfo=pytz.UTC)
-            except:
+                date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y')
+            except Exception as e:
+                print(str(e))
                 return None
         return date
     
