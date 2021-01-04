@@ -42,13 +42,13 @@ md = Markdown(app,
              )
 
 @app.route('/sitemap<sitemap_name>')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=86400)
 def sitemap(sitemap_name):
     if DEBUG:
         print('sitemap')
     try:
         response = make_response(models.Sitemap('sitemap'+sitemap_name, None, None).get_data().read(), 200)
-        if re.match(r'\.gz$', sitemap_name):
+        if sitemap_name.endswith('.gz'):
             response.mimetype = "application/x-gzip"
         else:
             response.mimetype = "application/xml"
@@ -57,7 +57,6 @@ def sitemap(sitemap_name):
         abort(404)
 
 @app.route('/robots.txt')
-@cache.cached(timeout=3600)
 def robots():
     if DEBUG:
         print('robots')
@@ -76,7 +75,7 @@ def robots():
 @app.route('/<int:year>/', defaults={'month': None, 'page': 0})
 @app.route('/<int:year>/<month>/page/<int:page>')
 @app.route('/<int:year>/<month>/', defaults={'page': 0})
-@cache.cached(timeout=3600)
+@cache.cached(timeout=86400)
 def archives(year, month, page):
     if DEBUG:
         print('archives')
@@ -110,7 +109,7 @@ def archives(year, month, page):
                                     )
 
 @app.route('/<int:year>/<month>/<slug>')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=7200)
 def post(year, month, slug):
     if DEBUG:
         print('post')
@@ -130,7 +129,7 @@ def post(year, month, slug):
 
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<int:page>')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=7200)
 def index(page):
     if DEBUG:
         print('index')

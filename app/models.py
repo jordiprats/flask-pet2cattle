@@ -68,7 +68,7 @@ class Sitemap(S3File):
                                             Key=self.base_object+'/'+self.url
                                         )
 
-
+# TODO: refactor to include pages?
 class Post(S3File):
     html = None
     metadata = None
@@ -90,6 +90,14 @@ class Post(S3File):
         except:
             pass
         return False
+
+    def get_last_modified(self):
+        publish_date = self.publish_date()
+
+        if not publish_date or self.last_modified > publish_date:
+            return self.last_modified
+        else:
+            return publish_date
 
     def publish_date(self):
         try:
