@@ -14,7 +14,7 @@ with gzip.open(filename=tmp_sitemap_pages, mode='wb') as sitemap_pages:
     sitemap_pages.write(bytes('\t<url>\n', 'utf-8'))
     sitemap_pages.write(bytes('\t\t<loc>https://pet2cattle.com/</loc>\n', 'utf-8'))
     sitemap_pages.write(bytes('\t\t<lastmod>'+datetime.now().strftime("%Y-%m-%d")+'</lastmod>\n', 'utf-8'))
-    sitemap_pages.write(bytes('\t\t<changefreq>dayly</changefreq>\n', 'utf-8'))
+    sitemap_pages.write(bytes('\t\t<changefreq>daily</changefreq>\n', 'utf-8'))
     sitemap_pages.write(bytes('\t\t<priority>0.6</priority>\n', 'utf-8'))
     sitemap_pages.write(bytes('\t</url>\n', 'utf-8'))
 
