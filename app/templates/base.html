@@ -7,7 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="author" content="Jordi Prats">
   <meta name="copyright" content="Copyright (c) Jordi Prats">
-  <meta name="description" content="">
+
+  {% if post_metadata['summary'] %}
+  <meta name="description" content="{{ post_metadata['summary'][0] }}">
+  {% endif %}
 
   {% if post_metadata['robots'] %}
   <META NAME="Robots" CONTENT="{{ post_metadata['robots'] }}" />

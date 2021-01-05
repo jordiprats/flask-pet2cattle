@@ -82,7 +82,7 @@ def archives(year, month, page):
     page_metadata={}
     page_metadata['robots']='noindex,follow'
     page_metadata['title']=['Archives: From pet to cattle']
-    page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
+    page_metadata['keywords']=['terraform, kubernetes, helm, pet vs cattle']
 
     if month:
         limit = 10
@@ -137,7 +137,8 @@ def index(page):
     page_metadata['title']=['From pet to cattle']
     if page!=0:
         page_metadata['robots']='noindex,follow'
-    page_metadata['keywords']=['k8s, terraform, kubernetes, pet vs cattle']
+    page_metadata['keywords']=['kubernetes, helm, terraform, pet vs cattle']
+    page_metadata['summary'][0]='Treat your clusters like cattle, not pets by learning how to use kubernetes, helm and terraform'
 
     response = models.Post.all(page, 5)
 
