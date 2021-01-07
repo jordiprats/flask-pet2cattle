@@ -21,7 +21,8 @@ posts = app.models.Post.all(page=0, limit=-1)['Posts']
 #
 
 rss_posts = tempfile.TemporaryFile()
-rss_posts.write(bytes('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" >\n', 'utf-8'))
+rss_posts.write(bytes('<?xml version="1.0" encoding="UTF-8"?>\n', 'utf-8'))
+rss_posts.write(bytes('<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" >\n', 'utf-8'))
 rss_posts.write(bytes('\n', 'utf-8'))
 rss_posts.write(bytes('<channel>\n', 'utf-8'))
 rss_posts.write(bytes('<title>From pet to cattle</title>\n', 'utf-8'))
@@ -45,6 +46,7 @@ for post in posts:
     rss_posts.write(bytes('\t</item>\n', 'utf-8'))
 
 rss_posts.write(bytes('</channel>\n', 'utf-8'))
+rss_posts.write(bytes('</rss>\n', 'utf-8'))
 rss_posts.seek(os.SEEK_SET)
 print(rss_posts.read().decode('utf-8'))
 
