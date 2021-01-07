@@ -6,6 +6,12 @@ import tempfile
 import gzip
 import os
 
+def date2rss(pub):
+    ctime = pub.ctime()
+    return (f'{ctime[0:3]}, {pub.day:02d} {ctime[4:7]}'
+                    + pub.strftime(' %Y %H:%M:%S %z'))
+
+
 # Posts
 
 posts = app.models.Post.all(page=0, limit=-1)['Posts']
@@ -32,12 +38,15 @@ rss_posts.write(bytes('\n', 'utf-8'))
 for post in posts:
     rss_posts.write(bytes('\t<item>\n', 'utf-8'))
     rss_posts.write(bytes('\t\t<title>'+post.get_title()+'</title>\n', 'utf-8'))
-    rss_posts.write(bytes('\t\t<link>'+post.url+'</link>\n', 'utf-8'))
+    rss_posts.write(bytes('\t\t<link>https://pet2cattle.com'+post.url+'</link>\n', 'utf-8'))
     rss_posts.write(bytes('\t\t<pubDate>'+post.get_last_modified().strftime('%a, %d %b %Y %H:%M:%S %z')+'</pubDate>\n', 'utf-8'))
     rss_posts.write(bytes('\t\t<description><![CDATA['+post.get_excerpt()+']]></description>\n', 'utf-8'))
+    rss_posts.write(bytes('\t\t<guid isPermaLink="true">https://pet2cattle.com'+post.url+'</guid>\n', 'utf-8'))
     rss_posts.write(bytes('\t</item>\n', 'utf-8'))
 
 rss_posts.write(bytes('</channel>\n', 'utf-8'))
+# rss_posts.seek(os.SEEK_SET)
+# print(rss_posts.read().decode('utf-8'))
 
 rss_posts.seek(os.SEEK_SET)
 sm_posts_rss = app.models.Sitemap('sitemap.rss', datetime.now(), rss_posts)
