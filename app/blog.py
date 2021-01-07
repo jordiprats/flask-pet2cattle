@@ -48,7 +48,9 @@ def sitemap(sitemap_name):
         print('sitemap')
     try:
         response = make_response(models.Sitemap('sitemap'+sitemap_name, None, None).get_data().read(), 200)
-        if sitemap_name.endswith('.gz'):
+        if sitemap_name.endswith('.rss'):
+            response.mimetype = "application/rss+xml"
+        elif sitemap_name.endswith('.gz'):
             response.mimetype = "application/x-gzip"
         else:
             response.mimetype = "application/xml"
