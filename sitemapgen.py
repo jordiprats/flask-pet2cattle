@@ -4,6 +4,7 @@ import app.models
 
 import tempfile
 import gzip
+import pytz
 import os
 
 def date2rss(pub):
@@ -28,7 +29,7 @@ rss_posts.write(bytes('<title>From pet to cattle</title>\n', 'utf-8'))
 rss_posts.write(bytes('<atom:link href="https://pet2cattle.com/sitemap.rss" rel="self" type="application/rss+xml" />\n', 'utf-8'))
 rss_posts.write(bytes('<link>https://pet2cattle.com</link>\n', 'utf-8'))
 rss_posts.write(bytes('<description>Tu referencia para la administración de sistemas</description>\n', 'utf-8'))
-rss_posts.write(bytes('<lastBuildDate>'+date2rss(datetime.now())+'</lastBuildDate>\n', 'utf-8'))
+rss_posts.write(bytes('<lastBuildDate>'+date2rss(datetime.now().replace(tzinfo=pytz.UTC))+'</lastBuildDate>\n', 'utf-8'))
 rss_posts.write(bytes('<language>en-US</language>\n', 'utf-8'))
 rss_posts.write(bytes('<sy:updatePeriod>daily</sy:updatePeriod>\n', 'utf-8'))
 rss_posts.write(bytes('<sy:updateFrequency>1</sy:updateFrequency>\n', 'utf-8'))
@@ -46,8 +47,8 @@ for post in posts:
 
 rss_posts.write(bytes('</channel>\n', 'utf-8'))
 rss_posts.write(bytes('</rss>\n', 'utf-8'))
-# rss_posts.seek(os.SEEK_SET)
-# print(rss_posts.read().decode('utf-8'))
+rss_posts.seek(os.SEEK_SET)
+print(rss_posts.read().decode('utf-8'))
 
 rss_posts.seek(os.SEEK_SET)
 sm_posts_rss = app.models.Sitemap('sitemap.rss', datetime.now(), rss_posts)

@@ -98,7 +98,7 @@ class Post(S3File):
         if not publish_date or self.last_modified > publish_date.replace(tzinfo=pytz.UTC):
             return self.last_modified
         else:
-            return publish_date
+            return publish_date.replace(tzinfo=pytz.UTC)
 
     def publish_date(self):
         try:
