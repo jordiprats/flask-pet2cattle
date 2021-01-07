@@ -46,8 +46,8 @@ for post in posts:
 
 rss_posts.write(bytes('</channel>\n', 'utf-8'))
 rss_posts.write(bytes('</rss>\n', 'utf-8'))
-rss_posts.seek(os.SEEK_SET)
-print(rss_posts.read().decode('utf-8'))
+# rss_posts.seek(os.SEEK_SET)
+# print(rss_posts.read().decode('utf-8'))
 
 rss_posts.seek(os.SEEK_SET)
 sm_posts_rss = app.models.Sitemap('sitemap.rss', datetime.now(), rss_posts)
