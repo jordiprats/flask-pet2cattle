@@ -25,6 +25,9 @@
   <!-- <meta property="og:image" content="http://pet2cattle.com/dsadsada.jpg"> -->
   <meta property="og:url" content="{{ page_url }}">
 
+  {% if pagination_prefix == '/' %}
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed for pet2cattle.com" href="https://pet2cattle.com/sitemap.rss" />
+  {% endif %}
 
   <style>
 pre {
