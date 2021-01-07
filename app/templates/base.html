@@ -10,6 +10,7 @@
 
   {% if post_metadata['summary'] %}
   <meta name="description" content="{{ post_metadata['summary'][0] }}">
+  <meta property="og:description" content="{{ post_metadata['summary'][0] }}">
   {% endif %}
 
   {% if post_metadata['robots'] %}
@@ -21,7 +22,6 @@
 	<meta name="keywords" content="{{ post_metadata['keywords'][0] }}">  
 
   <meta property="og:title" content="{{ post_metadata['title'][0] }}">
-  <meta property="og:description" content="In this second installment of the Flask Mega-Tutorial series, I&#39;m going to discuss how to work with templates.For your reference, below is a list of the articles in this series.Chapter 1: Hello,…">
   <!-- <meta property="og:image" content="http://pet2cattle.com/dsadsada.jpg"> -->
   <meta property="og:url" content="{{ page_url }}">
 
