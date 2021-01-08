@@ -52,6 +52,12 @@ class S3File:
 
         return s3_client.get_object(Bucket=MINIO_BUCKET, Key=self.base_object+'/'+self.url)['Body']
 
+    def __repr__(self):
+        return self.url
+    
+    def __str__(self):
+        return self.url
+
 
 class Sitemap(S3File):
     filehandle = None
@@ -69,14 +75,15 @@ class Sitemap(S3File):
                                             Key=self.base_object+'/'+self.url
                                         )
 
-# TODO: refactor to include pages?
-class Post(S3File):
+class Page(S3File):
     html = None
     metadata = None
     raw_md = None
+    bucket_prefix = 'pages'
 
-    def __init__(self, url, raw_md, last_modified):
-        super().__init__('posts', url, last_modified)
+    def __init__(self, url, raw_md, last_modified, bucket_prefix='pages'):
+        self.bucket_prefix = bucket_prefix
+        super().__init__(self.bucket_prefix, url, last_modified)
         self.raw_md = raw_md
         md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.html = md.convert(raw_md)
@@ -113,7 +120,10 @@ class Post(S3File):
         return date
     
     def get_print_date(self):
-        return self.metadata['date'][0]
+        try:
+            return self.publish_date().strftime("%d/%m/%Y")
+        except:
+            return ''
 
     def get_keywords(self):
         try:
@@ -142,21 +152,20 @@ class Post(S3File):
     def get_title(self):
         return self.metadata['title'][0]
 
+class Post(Page):
+    bucket_prefix = 'posts'
 
-    def __repr__(self):
-        return self.url
-    
-    def __str__(self):
-        return self.url
+    def __init__(self, url, raw_md, last_modified):
+        super().__init__( url, raw_md, last_modified, Post.bucket_prefix)
 
     def all(page=0, limit=5, prefix=None):
         global MINIO_BUCKET, s3_client
         init_s3_client()
 
         if prefix:
-            s3_prefix = 'posts'+prefix
+            s3_prefix = Post.bucket_prefix+prefix
         else:
-            s3_prefix = 'posts'
+            s3_prefix = Post.bucket_prefix
 
         data = {}
         data['next'] = False
@@ -169,10 +178,10 @@ class Post(S3File):
         get_key_value = lambda obj: obj['Key']
         for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
 
-            base_url = re.match(r'^posts(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
+            base_url = re.match(r'^'+Post.bucket_prefix+r'(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
             if not base_url:
                 continue
-            url = base_url.groups()[0] + slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', re.sub(r'^posts/[0-9]+/[0-9]+/', '', bucket_object['Key']))))
+            url = base_url.groups()[0] + slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', re.sub(r'^'+Post.bucket_prefix+r'/[0-9]+/[0-9]+/', '', bucket_object['Key']))))
 
             response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
             post = Post(url, response['Body'].read().decode('utf-8'), response['LastModified'])
@@ -197,13 +206,13 @@ class Post(S3File):
         global MINIO_BUCKET, s3_client
         init_s3_client()
 
-        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix='posts/'+str(year)+'/'+str(month), MaxKeys=1000)
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=Post.bucket_prefix+'/'+str(year)+'/'+str(month), MaxKeys=1000)
 
         if not 'Contents' in response.keys():
             return []
 
         for bucket_object in response['Contents']:
-            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', bucket_object['Key'].lstrip('posts/'+str(year)+'/'+str(month)+'/'))))
+            filename_slug = slugify(re.sub(r'^[0-9]+ ', '', re.sub(r'\.md$', '', bucket_object['Key'].lstrip(Post.bucket_prefix+'/'+str(year)+'/'+str(month)+'/'))))
 
             if slug == filename_slug:
                 response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
