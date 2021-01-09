@@ -88,7 +88,7 @@ class Page(S3File):
         if self.is_page():
             md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         else:
-            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta')
+            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
 
