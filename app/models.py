@@ -152,6 +152,27 @@ class Page(S3File):
     def get_title(self):
         return self.metadata['title'][0]
 
+    def filter(url):
+        global MINIO_BUCKET, s3_client
+        init_s3_client()
+
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=Page.bucket_prefix+'/', MaxKeys=1000)
+
+        if not 'Contents' in response.keys():
+            return []
+
+        for bucket_object in response['Contents']:
+            filename_slug = ''
+            items = re.sub(r'pages/', '', re.sub(r'\.md$', '', bucket_object['Key'])).split('/')
+            for item in items:
+                filename_slug += '/'+slugify(item)
+
+            if url == filename_slug:
+                response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
+                return [ Page(url, response['Body'].read().decode('utf-8'), response['LastModified']) ]
+
+        return []
+
 class Post(Page):
     bucket_prefix = 'posts'
 

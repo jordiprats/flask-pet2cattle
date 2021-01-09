@@ -163,11 +163,28 @@ def index(page):
 @cache.cached(timeout=3600)
 def catch_all(path):
     try:
+        print('/'+path)
+        page = models.Page.filter('/'+path)[0]
+        if page.is_published():
+            if DEBUG:
+                print('is page')
+            return render_template('page.html',
+                                                single=True, 
+                                                post_html=page.html, 
+                                                post_metadata=page.metadata, 
+                                                page_url=page.url, 
+                                                keywords=page.get_keywords()
+                                    )
+    except Exception as e:
+        print(str(e))
+
+    try:
         redirects_302 = cache.get('redirects_302')
         if not redirects_302:
             redirects_302 = yaml.safe_load(models.S3File('redirects', '302.yaml').get_data())
-        
         try:
+            if DEBUG:
+                print('redirect 302')
             return redirect(redirects_302['redirect'][path], code=302)
         except:
             pass
