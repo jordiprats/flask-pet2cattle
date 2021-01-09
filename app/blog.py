@@ -24,6 +24,12 @@ if os.getenv('DEBUG', False):
 else:
     DEBUG=False
 
+if os.getenv('FORCE_PUBLISH', False):
+    FORCE_PUBLISH=True
+else:
+    FORCE_PUBLISH=False
+
+
 config = {
     "DEBUG": False,          # some Flask specific configs
     "CACHE_TYPE": "filesystem", # Flask-Caching related configs
@@ -117,7 +123,7 @@ def post(year, month, slug):
         print('post')
     try:
         post = models.Post.filter(str(year), re.sub(r'[^0-9]', '', month), slug)[0]
-        if post.is_published():
+        if post.is_published() or FORCE_PUBLISH:
             return render_template('post.html',
                                                 single=True, 
                                                 post_html=post.html, 
@@ -165,7 +171,7 @@ def catch_all(path):
     try:
         print('/'+path)
         page = models.Page.filter('/'+path)[0]
-        if page.is_published():
+        if page.is_published() or FORCE_PUBLISH:
             if DEBUG:
                 print('is page')
             return render_template('page.html',

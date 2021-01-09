@@ -85,9 +85,12 @@ class Page(S3File):
         self.bucket_prefix = bucket_prefix
         super().__init__(self.bucket_prefix, url, last_modified)
         self.raw_md = raw_md
-        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
+
+    def is_page(self):
+            return True
 
     def is_published(self):
         try:
@@ -145,6 +148,7 @@ class Page(S3File):
             excerpt += line
 
         md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+
         excerpt_html = md.convert(excerpt)
 
         return re.sub(r'<h1>.*</h1>', '', excerpt_html)
@@ -175,6 +179,9 @@ class Page(S3File):
 
 class Post(Page):
     bucket_prefix = 'posts'
+
+    def is_page(self):
+        return False
 
     def __init__(self, url, raw_md, last_modified):
         super().__init__( url, raw_md, last_modified, Post.bucket_prefix)
