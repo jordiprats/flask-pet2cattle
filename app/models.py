@@ -85,7 +85,10 @@ class Page(S3File):
         self.bucket_prefix = bucket_prefix
         super().__init__(self.bucket_prefix, url, last_modified)
         self.raw_md = raw_md
-        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
+        if self.is_page():
+            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
+        else:
+            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta')
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
 
