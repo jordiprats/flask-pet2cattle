@@ -98,7 +98,7 @@ class Page(S3File):
     def is_published(self):
         try:
             if self.metadata['status'][0]=='published':
-                if self.is_page:
+                if self.is_page():
                     return True
                 else:
                     date_now  = datetime.now()
