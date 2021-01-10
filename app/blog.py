@@ -181,6 +181,9 @@ def catch_all(path):
                                                 page_url=page.url, 
                                                 keywords=page.get_keywords()
                                     )
+        else:
+            if DEBUG:
+                print(page.url+' is not published')
     except Exception as e:
         print(str(e))
 
