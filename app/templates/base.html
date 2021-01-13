@@ -14,9 +14,9 @@
   {% endif %}
 
   {% if post_metadata['robots'] %}
-  <META NAME="Robots" CONTENT="{{ post_metadata['robots'] }}" />
+  <meta name="Robots" content="{{ post_metadata['robots'] }}" />
   {% else %}
-  <META NAME="Robots" CONTENT="index,follow" />
+  <meta name="Robots" content="index,follow" />
   {% endif %}
 
 	<meta name="keywords" content="{{ post_metadata['keywords'][0] }}">  
