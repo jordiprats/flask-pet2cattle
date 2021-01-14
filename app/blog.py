@@ -47,6 +47,21 @@ md = Markdown(app,
               output_format='html4',
              )
 
+def get_navigation():
+    page_urls = models.Page.urls()
+
+    nav = []
+
+    for page_url in page_urls:
+        if '/' in page_url:
+            nav.append(page_url.split('/'))
+        else:
+            nav.append(page_url)
+
+    return nav
+
+
+
 @app.route('/sitemap<sitemap_name>')
 @cache.cached(timeout=86400)
 def sitemap(sitemap_name):
@@ -168,8 +183,10 @@ def index(page):
 @app.route('/<path:path>')
 @cache.cached(timeout=3600)
 def catch_all(path):
+    print(str(get_navigation()))
     try:
-        print('/'+path)
+        if DEBUG:
+            print('/'+path)
         page = models.Page.filter('/'+path)[0]
         if page.is_published() or FORCE_PUBLISH:
             if DEBUG:

@@ -182,6 +182,35 @@ class Page(S3File):
                 return [ Page(url, response['Body'].read().decode('utf-8'), response['LastModified']) ]
 
         return []
+    
+    def urls():
+        global MINIO_BUCKET, s3_client, DEBUG
+        init_s3_client()
+
+        # no hi hauria d'haver més de 1000 pàgines (ni 50 de fet)
+        response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=Page.bucket_prefix, MaxKeys=1000)
+
+        pages = []
+        get_key_value = lambda obj: obj['Key']
+        for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
+            tokenized = re.sub(r'^'+Page.bucket_prefix+r'/', '', bucket_object['Key']).split('/')
+            if len(tokenized) > 2:
+                if DEBUG:
+                    print('skipping '+bucket_object['Key'])
+                continue
+            
+            if len(tokenized) == 2:
+                url = slugify(tokenized[0])+'/'+slugify(re.sub(r'\.md$', '', tokenized[1]))
+            else:
+                url = slugify(re.sub(r'\.md$', '', tokenized[0]))
+
+            page_response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
+            page = Page(url, page_response['Body'].read().decode('utf-8'), page_response['LastModified'])
+
+            if page.is_published():
+                pages.append(url)
+
+        return pages
 
 class Post(Page):
     bucket_prefix = 'posts'
