@@ -17,6 +17,11 @@ MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'pet2cattle')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'AKIAIOSFODNN7EXAMPLE')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
 
+if os.getenv('FORCE_PUBLISH', False):
+    FORCE_PUBLISH=True
+else:
+    FORCE_PUBLISH=False
+
 s3_client = None
 
 def init_s3_client():
@@ -96,6 +101,8 @@ class Page(S3File):
             return True
 
     def is_published(self):
+        if FORCE_PUBLISH:
+            return True
         try:
             if self.metadata['status'][0]=='published':
                 if self.is_page():

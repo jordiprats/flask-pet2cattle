@@ -60,8 +60,6 @@ def get_navigation():
 
     return nav
 
-
-
 @app.route('/sitemap<sitemap_name>')
 @cache.cached(timeout=86400)
 def sitemap(sitemap_name):
@@ -196,7 +194,8 @@ def catch_all(path):
                                                 post_html=page.html, 
                                                 post_metadata=page.metadata, 
                                                 page_url=page.url, 
-                                                keywords=page.get_keywords()
+                                                keywords=page.get_keywords(),
+                                                navigation=get_navigation()
                                     )
         else:
             if DEBUG:
