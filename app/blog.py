@@ -47,16 +47,20 @@ md = Markdown(app,
               output_format='html4',
              )
 
+@cache.cached(timeout=86400, key_prefix="get_navigation")
 def get_navigation():
     page_urls = models.Page.urls()
 
     nav = []
 
     for page_url in page_urls:
+        print('/'+page_url)
+        print(str(models.Page.filter('/'+page_url)))
         if '/' in page_url:
-            nav.append(page_url.split('/'))
+            # TODO: multiples subpagines?
+            nav.append([page_url.split('/'), models.Page.filter('/'+page_url)[0].get_title()])
         else:
-            nav.append(page_url)
+            nav.append([page_url, models.Page.filter('/'+page_url)[0].get_title()])
 
     return nav
 
@@ -182,7 +186,7 @@ def index(page):
                                     )
 
 @app.route('/<path:path>')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=86400)
 def catch_all(path):
     print(str(get_navigation()))
     try:

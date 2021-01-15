@@ -91,9 +91,9 @@ class Page(S3File):
         super().__init__(self.bucket_prefix, url, last_modified)
         self.raw_md = raw_md
         if self.is_page():
-            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
+            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         else:
-            md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
 
@@ -160,7 +160,7 @@ class Page(S3File):
                 break
             excerpt += line
 
-        md = markdown.Markdown(extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+        md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
 
         excerpt_html = md.convert(excerpt)
 
@@ -184,7 +184,10 @@ class Page(S3File):
             for item in items:
                 filename_slug += '/'+slugify(item)
 
+            print(url+' vs '+filename_slug)
+
             if url == filename_slug:
+                print('found')
                 response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
                 return [ Page(url, response['Body'].read().decode('utf-8'), response['LastModified']) ]
 

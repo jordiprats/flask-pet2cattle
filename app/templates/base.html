@@ -66,15 +66,15 @@ pre {
             <a class="nav-link" href="/">Home</a>
           </li>
           {% for item in navigation %}
-            {% if item is string %}
+            {% if item[0] is string %}
               <li class="nav-item active">
-                <a class="nav-link" href="/{{ item }}">{{ item|capitalize }}</a>
+                <a class="nav-link" href="/{{ item[0] }}">{{ item[1] }}</a>
               </li>
             {% else %}
             <li class="nav-item dropdown active">
-              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ item[0] }}</a>
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ item[0][0] }}</a>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="/{{ item[0] }}/{{ item[1] }}">{{ item[1] }}</a>
+                <a class="dropdown-item" href="/{{ item[0][0] }}/{{ item[0][1] }}">{{ item[1] }}</a>
               </div>
             </li>
             {% endif %}
