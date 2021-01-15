@@ -127,6 +127,7 @@ def archives(year, month, page):
                                         page_number=page,
                                         has_next=response['next'],
                                         has_previous=page>0,
+                                        navigation=get_navigation()
                                     )
 
 @app.route('/<int:year>/<month>/<slug>')
@@ -142,7 +143,8 @@ def post(year, month, slug):
                                                 post_html=post.html, 
                                                 post_metadata=post.metadata, 
                                                 page_url=post.url, 
-                                                keywords=post.get_keywords()
+                                                keywords=post.get_keywords(),
+                                                navigation=get_navigation()
                                     )
     except:
         pass
@@ -176,6 +178,7 @@ def index(page):
                                         page_number=page,
                                         has_next=response['next'],
                                         has_previous=page>0,
+                                        navigation=get_navigation()
                                     )
 
 @app.route('/<path:path>')
