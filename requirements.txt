@@ -1,7 +1,7 @@
+python-slugify
+Flask-Markdown
+Flask-Caching
+PyYAML
 flask
 boto3
-Flask-Caching
-Flask-Markdown
-python-slugify
-PyYAML
 pytz

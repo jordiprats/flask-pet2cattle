@@ -1,6 +1,15 @@
+FROM rclone/rclone AS rclone
+
 FROM python:3.8-alpine
 
+RUN apk --no-cache add ca-certificates fuse tzdata git openssh && \
+    echo "user_allow_other" >> /etc/fuse.conf
+
+COPY --from=rclone /usr/local/bin/rclone /usr/local/bin/
+
 WORKDIR /code
+
+COPY sync.sh .
 
 # GUNICORN - not an actual dependency
 RUN pip install gunicorn
