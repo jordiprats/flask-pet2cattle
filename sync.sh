@@ -44,6 +44,7 @@ do
     mkdir repo
     git clone "${POSTS_REPO}" repo
 
+    rclone sync favicon.ico         "minio:${MINIO_BUCKET}/favicon.ico"
     rclone sync repo/posts          "minio:${MINIO_BUCKET}/posts"
     rclone sync repo/pages          "minio:${MINIO_BUCKET}/pages"
     rclone sync repo/redirects      "minio:${MINIO_BUCKET}/redirects"
