@@ -81,6 +81,17 @@ def sitemap(sitemap_name):
     except:
         abort(404)
 
+@app.route('/favicon.ico')
+def favicon():
+    if DEBUG:
+        print('favicon')
+    try:
+        response = make_response(models.S3File('', 'favicon.ico').get_data().read(), 200)
+        response.mimetype = "image/x-icon"
+        return response
+    except:
+        abort(404)
+
 @app.route('/robots.txt')
 def robots():
     if DEBUG:
