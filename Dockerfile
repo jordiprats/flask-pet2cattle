@@ -9,15 +9,15 @@ COPY --from=rclone /usr/local/bin/rclone /usr/local/bin/
 
 WORKDIR /code
 
-COPY sync.sh .
-
 # GUNICORN - not an actual dependency
 RUN pip install gunicorn
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
 COPY app /code/app
 COPY sitemapgen.py .
+COPY sync.sh .
 
 EXPOSE 8000
 
