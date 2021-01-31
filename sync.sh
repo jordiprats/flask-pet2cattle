@@ -10,7 +10,7 @@ chmod 700 /root/.ssh
 
 for key in /root/deploykeys/*;
 do
-    ln -s $key /root/.ssh
+    ln -s $key /root/.ssh >/dev/null 2>&1
 done
 
 if [ ! -f /root/.config/rclone/rclone.conf ];
@@ -44,7 +44,7 @@ do
     mkdir repo
     git clone "${POSTS_REPO}" repo
 
-    rclone sync favicon.ico         "minio:${MINIO_BUCKET}"
+    rclone sync repo/favicon.ico         "minio:${MINIO_BUCKET}"
     rclone sync repo/posts          "minio:${MINIO_BUCKET}/posts"
     rclone sync repo/pages          "minio:${MINIO_BUCKET}/pages"
     rclone sync repo/redirects      "minio:${MINIO_BUCKET}/redirects"
