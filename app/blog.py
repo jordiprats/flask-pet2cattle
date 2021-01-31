@@ -163,7 +163,7 @@ def post(year, month, slug):
                                     )
     except:
         pass
-    abort(404)
+    return catch_all(str(int)+'/'+month+'/'+slug)
 
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<int:page>')
@@ -228,7 +228,7 @@ def catch_all(path):
         try:
             if DEBUG:
                 print('redirect 302')
-            return redirect(redirects_302['redirect'][path], code=302)
+            return redirect(redirects_302['redirect']['/'+path], code=302)
         except:
             pass
 
