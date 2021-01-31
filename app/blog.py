@@ -163,7 +163,7 @@ def post(year, month, slug):
                                     )
     except:
         pass
-    return catch_all(str(int)+'/'+month+'/'+slug)
+    return catch_all(str(year)+'/'+month+'/'+slug)
 
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<int:page>')
