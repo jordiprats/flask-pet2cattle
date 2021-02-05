@@ -40,26 +40,22 @@
             <div class="row">
               <div class="col-lg-6">
                 <ul class="list-unstyled mb-0">
-                  {% for keyword in keywords %}
+                  {% for category in categories %}
                   <li>
-                    {{ keyword }}
+                    {{ category }}
                   </li>
                   {% endfor %}
                 </ul>
               </div>
-              <!-- <div class="col-lg-6">
+              <div class="col-lg-6">
                 <ul class="list-unstyled mb-0">
+                  {% for tag in tags %}
                   <li>
-                    <a href="#">python</a>
+                    {{ tag }}
                   </li>
-                  <li>
-                    <a href="#">micropython</a>
-                  </li>
-                  <li>
-                    <a href="#">esp32</a>
-                  </li>
+                  {% endfor %}
                 </ul>
-              </div> -->
+              </div>
             </div>
           </div>
         </div>

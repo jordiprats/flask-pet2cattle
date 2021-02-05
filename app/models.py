@@ -57,6 +57,16 @@ class S3File:
 
         return s3_client.get_object(Bucket=MINIO_BUCKET, Key=self.base_object+'/'+self.url)['Body']
 
+    def save(self, filehandle):
+        global MINIO_BUCKET, s3_client
+        init_s3_client()
+
+        response = s3_client.put_object(
+                                            Body=filehandle,
+                                            Bucket=MINIO_BUCKET,
+                                            Key=self.base_object+'/'+self.url
+                                        )   
+
     def __repr__(self):
         return self.url
     
@@ -145,6 +155,24 @@ class Page(S3File):
         try:
             keywords = []
             for keyword in self.metadata['keywords'][0].split(','):
+                keywords.append(keyword.strip())
+            return keywords
+        except:
+            return []
+
+    def get_categories(self):
+        try:
+            keywords = []
+            for keyword in self.metadata['categories'][0].split(','):
+                keywords.append(keyword.strip())
+            return keywords
+        except:
+            return []
+
+    def get_tags(self):
+        try:
+            keywords = []
+            for keyword in self.metadata['tags'][0].split(','):
                 keywords.append(keyword.strip())
             return keywords
         except:

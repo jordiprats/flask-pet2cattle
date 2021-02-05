@@ -47,6 +47,10 @@ md = Markdown(app,
               output_format='html4',
              )
 
+# @cache.cached(timeout=43200, key_prefix="get_categories")
+# def get_posts_categories():
+#     return pickle.load(models.S3File('indexes', 'categories.dict').get_data())
+
 @cache.cached(timeout=86400, key_prefix="get_navigation")
 def get_navigation():
     page_urls = models.Page.urls()
@@ -159,6 +163,8 @@ def post(year, month, slug):
                                                 post_metadata=post.metadata, 
                                                 page_url=post.url, 
                                                 keywords=post.get_keywords(),
+                                                categories=post.get_categories(),
+                                                tags=post.get_tags(),
                                                 navigation=get_navigation()
                                     )
     except:
