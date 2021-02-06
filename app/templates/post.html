@@ -42,7 +42,7 @@
                 <ul class="list-unstyled mb-0">
                   {% for category in categories %}
                   <li>
-                    {{ category }}
+                    <a href="/categories/{{ category|slugify }}">{{ category }}</a>
                   </li>
                   {% endfor %}
                 </ul>

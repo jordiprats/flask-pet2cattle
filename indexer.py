@@ -1,22 +1,24 @@
-# import app.models
+from slugify import slugify
 
-# import tempfile
-# import pickle
-# import os
+import app.models
 
-# categories = {}
+import tempfile
+import pickle
+import os
 
-# for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-#     for category in post.get_categories():
-#         if category in categories.keys():
-#             categories[category].append(post.url)
-#         else:
-#             categories[category]=[post.url]
+categories = {}
 
-# tmp_categories = tempfile.TemporaryFile()
+for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for category in post.get_categories():
+        if slugify(category) in categories.keys():
+            categories[slugify(category)].append(post.url)
+        else:
+            categories[slugify(category)]=[post.url]
 
-# pickle.dump(categories, tmp_categories)
-# tmp_categories.seek(os.SEEK_SET)
+tmp_categories = tempfile.TemporaryFile()
 
-# categories_idx = app.models.S3File('indexes', 'categories.dict')
-# categories_idx.save(tmp_categories)
+pickle.dump(categories, tmp_categories)
+tmp_categories.seek(os.SEEK_SET)
+
+categories_idx = app.models.S3File('indexes', 'categories.dict')
+categories_idx.save(tmp_categories)

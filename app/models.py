@@ -303,6 +303,14 @@ class Post(Page):
 
         return data
 
+    def getURL(url):
+        url_parts = re.match(r'^/([0-9]{4})/([0-9]{2})/([^/]*)$', url)
+
+        if url_parts:
+            return Post.filter(url_parts.groups()[0], url_parts.groups()[1], url_parts.groups()[2])
+        else:
+            return []
+
     def filter(year, month, slug):
         global MINIO_BUCKET, s3_client
         init_s3_client()

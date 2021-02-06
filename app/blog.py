@@ -15,6 +15,7 @@ from app import models
 from app import app
 
 import markdown
+import pickle
 import yaml
 import re
 import os
@@ -37,6 +38,7 @@ config = {
     'CACHE_DIR': 'cache'
 }
 
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config.from_mapping(config)
 cache = Cache(app)
 cache.clear()
@@ -46,10 +48,6 @@ md = Markdown(app,
               safe_mode=True,
               output_format='html4',
              )
-
-# @cache.cached(timeout=43200, key_prefix="get_categories")
-# def get_posts_categories():
-#     return pickle.load(models.S3File('indexes', 'categories.dict').get_data())
 
 @cache.cached(timeout=86400, key_prefix="get_navigation")
 def get_navigation():
@@ -110,6 +108,67 @@ def robots():
     response = make_response("\n".join(lines), 200)
     response.mimetype = "text/plain"
     return response
+
+@cache.cached(timeout=43200, key_prefix="get_categories")
+def get_posts_categories():
+    try:
+        print(models.S3File('indexes', 'categories.dict').get_data().read())
+        return pickle.loads(models.S3File('indexes', 'categories.dict').get_data().read())
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        return None
+
+@app.route('/categories', defaults={'category': None, 'page': 0})
+@app.route('/categories/<category>', defaults={'page': 0})
+@app.route('/categories/<category>/', defaults={'page': 0})
+@app.route('/categories/<category>/page/<int:page>')
+@cache.cached(timeout=43200)
+def categories(category, page):
+    if DEBUG:
+        print('categories')
+    categories = get_posts_categories()
+
+    print(str(categories))
+
+    if not categories:
+        abort(404)
+
+    if category:
+        if category in categories.keys():
+            page_metadata={}
+            page_metadata['robots']='noindex,follow'
+            page_metadata['title']=['Categories: '+category]
+            page_metadata['keywords']=[category]
+
+            prefix='/categories/'+category
+
+            posts_urls = categories[category][page*10:page*10+10]
+
+            if not posts_urls:
+                abort(404)
+
+            posts = []
+            for post_url in posts_urls:
+                candidate = models.Post.getURL(post_url)
+                if candidate:
+                    posts.append(candidate[0])
+
+            return render_template('index.html', 
+                                                single=False,
+                                                posts=posts, 
+                                                post_metadata=page_metadata, 
+                                                page_url='https://pet2cattle.com',
+                                                pagination_prefix=prefix+'/',
+                                                page_number=page,
+                                                has_next=categories[category][(page+1)*10:(page+1)*10+10],
+                                                has_previous=page>0,
+                                                navigation=get_navigation()
+                                            )
+        else:
+            abort(404)
+    else:
+        abort(404)
 
 @app.route('/<int:year>/page/<int:page>', defaults={'month': None})
 @app.route('/<int:year>/', defaults={'month': None, 'page': 0})
