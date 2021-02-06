@@ -17,6 +17,7 @@ RUN pip install -r requirements.txt
 
 COPY app /code/app
 COPY sitemapgen.py .
+COPY indexer.py .
 COPY sync.sh .
 
 EXPOSE 8000
