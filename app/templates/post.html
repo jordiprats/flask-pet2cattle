@@ -51,7 +51,7 @@
                 <ul class="list-unstyled mb-0">
                   {% for tag in tags %}
                   <li>
-                    {{ tag }}
+                    <a href="/tags/{{ tag|slugify }}">{{ tag }}</a>
                   </li>
                   {% endfor %}
                 </ul>

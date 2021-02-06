@@ -109,10 +109,70 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
+@cache.cached(timeout=43200, key_prefix="get_tags")
+def get_posts_tags():
+    try:
+        return pickle.loads(models.S3File('indexes', 'tags.dict').get_data().read())
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        return None
+
+@app.route('/tags', defaults={'tag': None, 'page': 0})
+@app.route('/tags/<tag>', defaults={'page': 0})
+@app.route('/tags/<tag>/', defaults={'page': 0})
+@app.route('/tags/<tag>/page/<int:page>')
+@cache.cached(timeout=43200)
+def tags(tag, page):
+    if DEBUG:
+        print('tags')
+    tags = get_posts_tags()
+
+    print(str(tags))
+
+    if not tags:
+        abort(404)
+
+    if tag:
+        if tag in tags.keys():
+            page_metadata={}
+            page_metadata['robots']='noindex,follow'
+            page_metadata['title']=['Tag: '+tag]
+            page_metadata['keywords']=[tag]
+
+            prefix='/tags/'+tag
+
+            posts_urls = tags[tag][page*10:page*10+10]
+
+            if not posts_urls:
+                abort(404)
+
+            posts = []
+            for post_url in posts_urls:
+                candidate = models.Post.getURL(post_url)
+                if candidate:
+                    posts.append(candidate[0])
+
+            return render_template('index.html', 
+                                                single=False,
+                                                posts=posts, 
+                                                post_metadata=page_metadata, 
+                                                page_url='https://pet2cattle.com',
+                                                pagination_prefix=prefix+'/',
+                                                page_number=page,
+                                                has_next=tags[tag][(page+1)*10:(page+1)*10+10],
+                                                has_previous=page>0,
+                                                navigation=get_navigation()
+                                            )
+        else:
+            abort(404)
+    else:
+        # TODO: llista de tags
+        abort(404)
+
 @cache.cached(timeout=43200, key_prefix="get_categories")
 def get_posts_categories():
     try:
-        print(models.S3File('indexes', 'categories.dict').get_data().read())
         return pickle.loads(models.S3File('indexes', 'categories.dict').get_data().read())
     except Exception as e:
         if DEBUG:
@@ -168,6 +228,7 @@ def categories(category, page):
         else:
             abort(404)
     else:
+        # TODO: llista de categories
         abort(404)
 
 @app.route('/<int:year>/page/<int:page>', defaults={'month': None})
