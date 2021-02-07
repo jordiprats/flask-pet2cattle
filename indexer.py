@@ -49,3 +49,27 @@ try:
     print("tags.dict OK")
 except Exception as e:
     print("Error generant tags.dict: "+str(e))
+
+try:
+    tag_cloud = {}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+        for tag in post.get_tags():
+            tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+        for category in post.get_categories():
+            tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
+
+    tmp_tagcloud = tempfile.TemporaryFile()
+
+    pickle.dump(tags, tmp_tagcloud)
+    tmp_tagcloud.seek(os.SEEK_SET)
+
+    tagcloud_idx = app.models.S3File('indexes', 'tag_cloud.dict')
+    tagcloud_idx.save(tmp_tagcloud)
+
+    print("tag_cloud.dict OK")
+    print(str(tag_cloud))
+except Exception as e:
+    print("Error generant tag_cloud.dict: "+str(e))

@@ -139,6 +139,7 @@ def tags(tag, page):
             page_metadata['robots']='noindex,follow'
             page_metadata['title']=['Tag: '+tag]
             page_metadata['keywords']=[tag]
+            page_metadata['summary']=['Post containing tag '+tag]
 
             prefix='/tags/'+tag
 
@@ -200,6 +201,7 @@ def categories(category, page):
             page_metadata['robots']='noindex,follow'
             page_metadata['title']=['Categories: '+category]
             page_metadata['keywords']=[category]
+            page_metadata['summary']=['Posts belonging to the category '+category]
 
             prefix='/categories/'+category
 
@@ -243,6 +245,10 @@ def archives(year, month, page):
     page_metadata['robots']='noindex,follow'
     page_metadata['title']=['Archives: From pet to cattle']
     page_metadata['keywords']=['terraform, kubernetes, helm, pet vs cattle']
+    if month:
+        page_metadata['summary']=['Archived posts from '+month+'/'+str(year)]
+    else:
+        page_metadata['summary']=['Archived posts from '+str(year)]
 
     if month:
         limit = 10
