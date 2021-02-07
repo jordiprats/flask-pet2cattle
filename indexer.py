@@ -70,6 +70,7 @@ try:
     tagcloud_idx.save(tmp_tagcloud)
 
     print("tag_cloud.dict OK")
-    print(str(tag_cloud))
 except Exception as e:
     print("Error generant tag_cloud.dict: "+str(e))
+
+# TODO: clear cache
