@@ -95,7 +95,6 @@ try:
     tagcloud_idx = app.models.S3File('indexes', 'tag_cloud.dict')
     tagcloud_idx.save(tmp_tagcloud)
 
-    print(str(tag_cloud))
     print("tag_cloud.dict OK")
 except Exception as e:
     print("Error generant tag_cloud.dict: "+str(e))
