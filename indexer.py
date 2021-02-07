@@ -61,14 +61,41 @@ try:
         for category in post.get_categories():
             tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
 
+    count = 0
+    sum = 0
+    to_delete = []
+    for tag in tag_cloud.keys():
+        if tag_cloud[tag]['count']!=1:
+            count += 1
+            sum += tag_cloud[tag]['count']
+        else:
+            to_delete.append(tag)
+    
+    mean = sum/count
+    print(mean)
+
+    for tag in to_delete:
+        del tag_cloud[tag]
+
+    for tag in tag_cloud.keys():
+        if tag_cloud[tag]['count'] > mean+(mean/2):
+            tag_cloud[tag]['size'] = "h3"
+        elif tag_cloud[tag]['count'] > mean:
+            tag_cloud[tag]['size'] = "h4"
+        elif tag_cloud[tag]['count'] > mean-(mean/2):
+            tag_cloud[tag]['size'] = "h5"
+        else:
+            tag_cloud[tag]['size'] = "h6"
+
     tmp_tagcloud = tempfile.TemporaryFile()
 
-    pickle.dump(tags, tmp_tagcloud)
+    pickle.dump(tag_cloud, tmp_tagcloud)
     tmp_tagcloud.seek(os.SEEK_SET)
 
     tagcloud_idx = app.models.S3File('indexes', 'tag_cloud.dict')
     tagcloud_idx.save(tmp_tagcloud)
 
+    print(str(tag_cloud))
     print("tag_cloud.dict OK")
 except Exception as e:
     print("Error generant tag_cloud.dict: "+str(e))

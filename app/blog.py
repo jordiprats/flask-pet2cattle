@@ -163,7 +163,8 @@ def tags(tag, page):
                                                 page_number=page,
                                                 has_next=tags[tag][(page+1)*10:(page+1)*10+10],
                                                 has_previous=page>0,
-                                                navigation=get_navigation()
+                                                navigation=get_navigation(),
+                                                tag_cloud=None
                                             )
         else:
             abort(404)
@@ -225,7 +226,8 @@ def categories(category, page):
                                                 page_number=page,
                                                 has_next=categories[category][(page+1)*10:(page+1)*10+10],
                                                 has_previous=page>0,
-                                                navigation=get_navigation()
+                                                navigation=get_navigation(),
+                                                tag_cloud=None
                                             )
         else:
             abort(404)
@@ -272,7 +274,8 @@ def archives(year, month, page):
                                         page_number=page,
                                         has_next=response['next'],
                                         has_previous=page>0,
-                                        navigation=get_navigation()
+                                        navigation=get_navigation(),
+                                        tag_cloud=None
                                     )
 
 @app.route('/<int:year>/<month>/<slug>')
@@ -296,6 +299,15 @@ def post(year, month, slug):
     except:
         pass
     return catch_all(str(year)+'/'+month+'/'+slug)
+
+@cache.cached(timeout=43200, key_prefix="get_tag_cloud")
+def get_tag_cloud():
+    try:
+        return pickle.loads(models.S3File('indexes', 'tag_cloud.dict').get_data().read())
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        return None
 
 @app.route('/', defaults={'page': 0})
 @app.route('/page/<int:page>')
@@ -325,7 +337,8 @@ def index(page):
                                         page_number=page,
                                         has_next=response['next'],
                                         has_previous=page>0,
-                                        navigation=get_navigation()
+                                        navigation=get_navigation(),
+                                        tag_cloud=get_tag_cloud(),
                                     )
 
 @app.route('/<path:path>')

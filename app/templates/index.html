@@ -52,6 +52,25 @@
           </div>
         </div> -->
 
+        <!-- Side Widget -->
+        <div class="card my-4">
+          <h5 class="card-header">From pet to cattle</h5>
+          <div class="card-body">
+            Treat your kubernetes clusters like cattle, not pets
+          </div>
+        </div>
+
+        {% if tag_cloud %}
+        <div class="card my-4">
+          <h5 class="card-header">cloud</h5>
+          <div class="card-body">
+            {% for key, data in tag_cloud.items() %}
+                <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}">{{ key }}</a></span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
         <!-- Categories Widget -->
         <!-- <div class="card my-4">
           <h5 class="card-header">Categories</h5>
@@ -86,14 +105,6 @@
             </div>
           </div>
         </div> -->
-
-        <!-- Side Widget -->
-        <div class="card my-4">
-          <h5 class="card-header">From pet to cattle</h5>
-          <div class="card-body">
-            Treat your kubernetes clusters like cattle, not pets
-          </div>
-        </div>
 
       </div>
 
