@@ -3,7 +3,9 @@ from slugify import slugify
 import app.models
 
 import tempfile
+import random
 import pickle
+import sys
 import os
 
 try:
@@ -51,31 +53,30 @@ except Exception as e:
     print("Error generant tags.dict: "+str(e))
 
 try:
+    ordered_tag_cloud = {}
     tag_cloud = {}
 
     for post in app.models.Post.all(page=0, limit=-1)['Posts']:
         for tag in post.get_tags():
-            tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
+            ordered_tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
 
     for post in app.models.Post.all(page=0, limit=-1)['Posts']:
         for category in post.get_categories():
-            tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
+            ordered_tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
 
     count = 0
     sum = 0
     to_delete = []
-    for tag in tag_cloud.keys():
-        if tag_cloud[tag]['count']!=1:
+    tag_keys = list(ordered_tag_cloud.keys())
+    random.shuffle(tag_keys)
+    for tag in tag_keys:
+        if ordered_tag_cloud[tag]['count']!=1:
+            tag_cloud[tag] = ordered_tag_cloud[tag]
             count += 1
             sum += tag_cloud[tag]['count']
-        else:
-            to_delete.append(tag)
     
     mean = sum/count
-    print(mean)
-
-    for tag in to_delete:
-        del tag_cloud[tag]
+    # print(mean)
 
     for tag in tag_cloud.keys():
         if tag_cloud[tag]['count'] > mean+(mean/2):
@@ -98,5 +99,6 @@ try:
     print("tag_cloud.dict OK")
 except Exception as e:
     print("Error generant tag_cloud.dict: "+str(e))
-
-# TODO: clear cache
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
