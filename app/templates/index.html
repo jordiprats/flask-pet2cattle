@@ -63,7 +63,7 @@
         {% if tag_cloud %}
         <div class="card my-4">
           <h5 class="card-header">cloud</h5>
-          <div class="card-body">
+          <div style="text-align: justify;" class="card-body">
             {% for key, data in tag_cloud.items() %}
                 <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}">{{ key }}</a></span>
             {% endfor %}
