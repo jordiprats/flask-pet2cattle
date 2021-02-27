@@ -143,7 +143,7 @@ def tags(tag, page):
 
             prefix='/tags/'+tag
 
-            posts_urls = tags[tag][page*10:page*10+10]
+            posts_urls = tags[tag][page*5:page*5+5]
 
             if not posts_urls:
                 abort(404)
@@ -220,7 +220,7 @@ def categories(category, page):
 
             prefix='/categories/'+category
 
-            posts_urls = categories[category][page*10:page*10+10]
+            posts_urls = categories[category][page*5:page*5+5]
 
             if not posts_urls:
                 abort(404)
