@@ -65,7 +65,7 @@
           <h5 class="card-header">cloud</h5>
           <div style="text-align: justify;" class="card-body">
             {% for key, data in tag_cloud.items() %}
-                <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}">{{ key }}</a></span>
+                <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}/">{{ key }}</a></span>
             {% endfor %}
           </div>
         </div>
@@ -76,7 +76,7 @@
           <h5 class="card-header">tags related to this category</h5>
           <div style="text-align: justify;" class="card-body">
             {% for key, data in cat2tag.items() %}
-                <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}">{{ key }}</a></span>
+                <span class="{{ data['size'] }}"><a class="text-dark" href="{{ data['url'] }}/">{{ key }}</a></span>
             {% endfor %}
           </div>
         </div>
