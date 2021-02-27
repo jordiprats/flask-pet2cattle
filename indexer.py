@@ -102,3 +102,53 @@ except Exception as e:
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
+
+try:
+    cat2tag = {}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+        for category in post.get_categories():
+            if slugify(category) in cat2tag.keys():
+                tags = cat2tag[slugify(category)]
+            else:
+                tags = {}
+            for tag in post.get_tags():
+                if tag in tags.keys():
+                    tags[tag] = { 'count': tags[tag]['count']+1, 'url': '/tags/'+slugify(tag)}
+                else:
+                    tags[tag] = { 'count': 1, 'url': '/tags/'+slugify(tag)}
+            cat2tag[slugify(category)] = tags
+
+            count = 0
+            sum = 0
+            for tag in cat2tag[slugify(category)].keys():
+                count += 1
+                sum += cat2tag[slugify(category)][tag]['count']
+            
+            mean = sum/count
+
+            for tag in cat2tag[slugify(category)].keys():
+                if cat2tag[slugify(category)][tag]['count'] > mean+(mean/2):
+                    cat2tag[slugify(category)][tag]['size'] = "h3"
+                elif cat2tag[slugify(category)][tag]['count'] > mean:
+                    cat2tag[slugify(category)][tag]['size'] = "h4"
+                elif cat2tag[slugify(category)][tag]['count'] > mean-(mean/2):
+                    cat2tag[slugify(category)][tag]['size'] = "h5"
+                else:
+                    cat2tag[slugify(category)][tag]['size'] = "h6"
+
+    print(str(cat2tag))
+
+    tmp_c2t = tempfile.TemporaryFile()
+
+    pickle.dump(cat2tag, tmp_c2t)
+    tmp_c2t.seek(os.SEEK_SET)
+
+    c2t_idx = app.models.S3File('indexes', 'cat2tag.dict')
+    c2t_idx.save(tmp_c2t)
+
+except Exception as e:
+    print("Error generant cat2tag.dict: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)

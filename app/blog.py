@@ -181,6 +181,15 @@ def get_posts_categories():
             print(str(e))
         return None
 
+@cache.cached(timeout=43200, key_prefix="get_cat2tag")
+def get_cat2tag():
+    try:
+        return pickle.loads(models.S3File('indexes', 'cat2tag.dict').get_data().read())
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        return None
+
 @app.route('/categories', defaults={'category': None, 'page': 0})
 @app.route('/categories/<category>', defaults={'page': 0})
 @app.route('/categories/<category>/', defaults={'page': 0})
@@ -190,8 +199,13 @@ def categories(category, page):
     if DEBUG:
         print('categories')
     categories = get_posts_categories()
+    cat2tag = get_cat2tag()
 
-    print(str(categories))
+    if DEBUG:
+        print("CATEGORIES")
+        print(str(categories))
+        print("CAT2TAG")
+        print(str(cat2tag))
 
     if not categories:
         abort(404)
@@ -227,7 +241,8 @@ def categories(category, page):
                                                 has_next=categories[category][(page+1)*10:(page+1)*10+10],
                                                 has_previous=page>0,
                                                 navigation=get_navigation(),
-                                                tag_cloud=None
+                                                tag_cloud=None,
+                                                cat2tag=cat2tag[category]
                                             )
         else:
             abort(404)
