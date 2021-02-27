@@ -15,10 +15,10 @@ RUN pip install gunicorn
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY app /code/app
 COPY sitemapgen.py .
 COPY indexer.py .
 COPY sync.sh .
+COPY app /code/app
 
 EXPOSE 8000
 
