@@ -136,7 +136,7 @@ def tags(tag, page):
     if tag:
         if tag in tags.keys():
             page_metadata={}
-            page_metadata['robots']='noindex,follow'
+            page_metadata['robots']='noindex,nofollow'
             page_metadata['title']=['Tag: '+tag]
             page_metadata['keywords']=[tag]
             page_metadata['summary']=['Post containing tag '+tag]
@@ -213,7 +213,7 @@ def categories(category, page):
     if category:
         if category in categories.keys():
             page_metadata={}
-            page_metadata['robots']='noindex,follow'
+            page_metadata['robots']='noindex,nofollow'
             page_metadata['title']=['Categories: '+category]
             page_metadata['keywords']=[category]
             page_metadata['summary']=['Posts belonging to the category '+category]
