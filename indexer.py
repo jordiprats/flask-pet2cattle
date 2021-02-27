@@ -80,9 +80,9 @@ try:
 
     for tag in tag_cloud.keys():
         if tag_cloud[tag]['count'] > mean+(mean/2):
-            tag_cloud[tag]['size'] = "h3"
+            tag_cloud[tag]['size'] = "h2"
         elif tag_cloud[tag]['count'] > mean:
-            tag_cloud[tag]['size'] = "h4"
+            tag_cloud[tag]['size'] = "h3"
         elif tag_cloud[tag]['count'] > mean-(mean/2):
             tag_cloud[tag]['size'] = "h5"
         else:
@@ -129,15 +129,13 @@ try:
 
             for tag in cat2tag[slugify(category)].keys():
                 if cat2tag[slugify(category)][tag]['count'] > mean+(mean/2):
-                    cat2tag[slugify(category)][tag]['size'] = "h3"
+                    cat2tag[slugify(category)][tag]['size'] = "h2"
                 elif cat2tag[slugify(category)][tag]['count'] > mean:
-                    cat2tag[slugify(category)][tag]['size'] = "h4"
+                    cat2tag[slugify(category)][tag]['size'] = "h3"
                 elif cat2tag[slugify(category)][tag]['count'] > mean-(mean/2):
                     cat2tag[slugify(category)][tag]['size'] = "h5"
                 else:
                     cat2tag[slugify(category)][tag]['size'] = "h6"
-
-    print(str(cat2tag))
 
     tmp_c2t = tempfile.TemporaryFile()
 
