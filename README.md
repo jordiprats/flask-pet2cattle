@@ -14,3 +14,9 @@ docker run -d -p 9000:9000 \
 ```
 MINIO_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE" MINIO_SECRET_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" flask run -p 8000
 ```
+
+## development
+
+```
+FORCE_PUBLISH=1 DEBUG=1 flask run -p 8000
+```
