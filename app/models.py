@@ -195,6 +195,15 @@ class Page(S3File):
         return re.sub(r'<h1>.*</h1>', '', excerpt_html)
 
     def get_title(self):
+        try:
+            buf = io.StringIO(self.raw_md)
+            lines = buf.readlines(10000)
+
+            for line in lines:
+                if re.match(r'^# ', line):
+                    return re.sub(r'^# ', '', line)
+        except:
+            pass
         return self.metadata['title'][0]
 
     def filter(url):
