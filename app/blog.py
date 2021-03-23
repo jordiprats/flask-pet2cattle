@@ -30,10 +30,14 @@ if os.getenv('FORCE_PUBLISH', False):
 else:
     FORCE_PUBLISH=False
 
+if DEBUG:
+    CACHE_TYPE = "null"
+else:
+    CACHE_TYPE = "filesystem"
 
 config = {
-    "DEBUG": False,          # some Flask specific configs
-    "CACHE_TYPE": "filesystem", # Flask-Caching related configs
+    "DEBUG": DEBUG,
+    "CACHE_TYPE": CACHE_TYPE,
     "CACHE_DEFAULT_TIMEOUT": 300,
     'CACHE_DIR': 'cache'
 }

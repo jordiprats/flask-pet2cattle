@@ -220,11 +220,7 @@ class Page(S3File):
             items = re.sub(r'pages/', '', re.sub(r'\.md$', '', bucket_object['Key'])).split('/')
             for item in items:
                 filename_slug += '/'+slugify(item)
-
-            print(url+' vs '+filename_slug)
-
             if url == filename_slug:
-                print('found')
                 response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
                 return [ Page(url, response['Body'].read().decode('utf-8'), response['LastModified']) ]
 
