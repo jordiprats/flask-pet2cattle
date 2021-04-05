@@ -70,6 +70,29 @@ def get_navigation():
 
     return nav
 
+@app.route('/static/<file_category>/<filename>')
+@cache.cached(timeout=86400)
+def static_files(file_category, filename):
+    if DEBUG:
+        print('static')
+    try:
+        if DEBUG:
+            print('url: static/'+file_category+'/'+filename)
+        response = make_response(models.Static(file_category+'/'+filename, None, None).get_data().read(), 200)
+        if filename.endswith('.jpg'):
+            response.mimetype = "image/jpeg"
+        elif filename.endswith('.jpeg'):
+            response.mimetype = "image/jpeg"
+        elif filename.endswith('.png'):
+            response.mimetype = "image/png"
+        else:
+            response.mimetype = "image/jpeg"
+        return response
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        abort(404)
+
 @app.route('/sitemap<sitemap_name>')
 @cache.cached(timeout=86400)
 def sitemap(sitemap_name):

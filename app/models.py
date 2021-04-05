@@ -73,6 +73,21 @@ class S3File:
     def __str__(self):
         return self.url
 
+class Static(S3File):
+    filehandle = None
+    def __init__(self, url, last_modified, filehandle):
+        super().__init__('static', url, last_modified)
+        self.filehandle = filehandle
+    
+    def save(self):
+        global MINIO_BUCKET, s3_client
+        init_s3_client()
+
+        response = s3_client.put_object(
+                                            Body=self.filehandle,
+                                            Bucket=MINIO_BUCKET,
+                                            Key=self.base_object+'/'+self.url
+                                        )
 
 class Sitemap(S3File):
     filehandle = None
