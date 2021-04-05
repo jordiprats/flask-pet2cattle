@@ -53,12 +53,21 @@
         </div> -->
 
         <!-- Side Widget -->
+        {% if 'kubernetes' in post_metadata['keywords'] %}
+        <div class="card my-4">
+          <h5 class="card-header">Kubernetes:<br>container orchestration</h5>
+          <div class="card-body">
+            <center><img style="width: 100%;" src="/static/categories/kubernetes_small.jpg" alt="kubernetes"></center>
+          </div>
+        </div>
+        {% else %}
         <div class="card my-4">
           <h5 class="card-header">From pet to cattle</h5>
           <div class="card-body">
             Treat your kubernetes clusters like cattle, not pets
           </div>
         </div>
+        {% endif %}
 
         {% if tag_cloud %}
         <div class="card my-4">
