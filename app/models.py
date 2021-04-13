@@ -17,6 +17,11 @@ MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'pet2cattle')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'AKIAIOSFODNN7EXAMPLE')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
 
+if os.getenv('DEBUG', False):
+    DEBUG=True
+else:
+    DEBUG=False
+
 if os.getenv('FORCE_PUBLISH', False):
     FORCE_PUBLISH=True
 else:
