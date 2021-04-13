@@ -29,7 +29,8 @@ def init_s3_client():
 
     if not s3_client:
         try:
-            print("connecting: "+MINIO_URL)
+            if DEBUG:
+                print("connecting: "+MINIO_URL)
             s3_client = boto3.client(
                                         service_name='s3',
                                         endpoint_url=MINIO_URL,
@@ -38,7 +39,8 @@ def init_s3_client():
                                         config=Config(signature_version='s3v4'),
                                     )
         except:
-            print("ERROR: unable to connect to bucket")
+            if DEBUG:
+                print("ERROR: unable to connect to bucket")
             raise Exception('unable to connect to bucket')
 
 class S3File:
@@ -116,9 +118,9 @@ class Page(S3File):
         super().__init__(self.bucket_prefix, url, last_modified)
         self.raw_md = raw_md
         if self.is_page():
-            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
+            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         else:
-            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+            md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta'])
         self.html = md.convert(raw_md)
         self.metadata = md.Meta
 
@@ -152,11 +154,13 @@ class Page(S3File):
         try:
             date = datetime.strptime(self.metadata['date'][0], '%d/%m/%Y')
         except Exception as e:
-            print(str(e))
+            if DEBUG:
+                print(str(e))
             try:
                 date = datetime.strptime(self.metadata['date'][0], '%-d/%-m/%Y')
             except Exception as e:
-                print(str(e))
+                if DEBUG:
+                    print(str(e))
                 return None
         return date
     
@@ -203,7 +207,7 @@ class Page(S3File):
                 break
             excerpt += line
 
-        md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+        md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta'])
 
         excerpt_html = md.convert(excerpt)
 

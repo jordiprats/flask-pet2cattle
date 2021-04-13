@@ -60,8 +60,9 @@ def get_navigation():
     nav = []
 
     for page_url in page_urls:
-        print('/'+page_url)
-        print(str(models.Page.filter('/'+page_url)))
+        if DEBUG:
+            print('/'+page_url)
+            print(str(models.Page.filter('/'+page_url)))
         if '/' in page_url:
             # TODO: multiples subpagines?
             nav.append([page_url.split('/'), models.Page.filter('/'+page_url)[0].get_title()])
@@ -386,7 +387,8 @@ def index(page):
 @app.route('/<path:path>')
 @cache.cached(timeout=86400)
 def catch_all(path):
-    print(str(get_navigation()))
+    if DEBUG:
+        print(str(get_navigation()))
     try:
         if DEBUG:
             print('/'+path)
@@ -406,7 +408,8 @@ def catch_all(path):
             if DEBUG:
                 print(page.url+' is not published')
     except Exception as e:
-        print(str(e))
+        if DEBUG:
+            print(str(e))
 
     try:
         redirects_302 = cache.get('redirects_302')
@@ -420,6 +423,7 @@ def catch_all(path):
             pass
 
     except Exception as e:
-        print(str(e))
+        if DEBUG:
+            print(str(e))
         pass
     abort(404)

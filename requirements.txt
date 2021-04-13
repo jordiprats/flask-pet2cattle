@@ -1,6 +1,7 @@
 python-slugify
 Flask-Markdown
 Flask-Caching
+Pygments
 PyYAML
 flask
 boto3
