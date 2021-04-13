@@ -11,6 +11,10 @@ def date2rss(pub):
     ctime = pub.ctime()
     return (f'{ctime[0:3]}, {pub.day:02d} {ctime[4:7]}' + pub.strftime(' %Y %H:%M:%S %z'))
 
+if os.getenv('DEBUG', False):
+    DEBUG=True
+else:
+    DEBUG=False
 
 # Posts
 
