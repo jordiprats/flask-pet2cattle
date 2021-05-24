@@ -95,6 +95,7 @@ def static_files(file_category, filename):
         abort(404)
 
 @app.route('/sitemap<sitemap_name>')
+@app.route('/feed<sitemap_name>')
 @cache.cached(timeout=86400)
 def sitemap(sitemap_name):
     if DEBUG:
