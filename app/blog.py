@@ -138,7 +138,7 @@ def robots():
     response.mimetype = "text/plain"
     return response
 
-@cache.cached(timeout=43200, key_prefix="get_tags")
+@cache.cached(timeout=7200, key_prefix="get_tags")
 def get_posts_tags():
     try:
         return pickle.loads(models.S3File('indexes', 'tags.dict').get_data().read())
@@ -151,7 +151,7 @@ def get_posts_tags():
 @app.route('/tags/<tag>', defaults={'page': 0})
 @app.route('/tags/<tag>/', defaults={'page': 0})
 @app.route('/tags/<tag>/page/<int:page>')
-@cache.cached(timeout=43200)
+@cache.cached(timeout=7200)
 def tags(tag, page):
     if DEBUG:
         print('tags')
@@ -201,7 +201,7 @@ def tags(tag, page):
         # TODO: llista de tags
         abort(404)
 
-@cache.cached(timeout=43200, key_prefix="get_categories")
+@cache.cached(timeout=7200, key_prefix="get_categories")
 def get_posts_categories():
     try:
         return pickle.loads(models.S3File('indexes', 'categories.dict').get_data().read())
@@ -210,7 +210,7 @@ def get_posts_categories():
             print(str(e))
         return None
 
-@cache.cached(timeout=43200, key_prefix="get_cat2tag")
+@cache.cached(timeout=7200, key_prefix="get_cat2tag")
 def get_cat2tag():
     try:
         return pickle.loads(models.S3File('indexes', 'cat2tag.dict').get_data().read())
@@ -223,7 +223,7 @@ def get_cat2tag():
 @app.route('/categories/<category>', defaults={'page': 0})
 @app.route('/categories/<category>/', defaults={'page': 0})
 @app.route('/categories/<category>/page/<int:page>')
-@cache.cached(timeout=43200)
+@cache.cached(timeout=7200)
 def categories(category, page):
     if DEBUG:
         print('categories')
