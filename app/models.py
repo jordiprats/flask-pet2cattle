@@ -58,6 +58,9 @@ class S3File:
         self.url = url
         self.last_modified = last_modified
     
+    def get_url(self):
+        return self.url
+
     def get_data(self):
         global MINIO_BUCKET, s3_client
         init_s3_client()
@@ -281,6 +284,10 @@ class Page(S3File):
 
 class Post(Page):
     bucket_prefix = 'posts'
+    read_time = 2
+
+    def get_read_time(self):
+        return self.read_time
 
     def is_page(self):
         return False
@@ -324,6 +331,9 @@ class Post(Page):
                 if limit>=0 and count<page*limit:
                     count += 1
                     continue
+                
+                post.read_time = (len(post.raw_md.split())//200)+1
+
                 posts.append(post)
                 count += 1
 

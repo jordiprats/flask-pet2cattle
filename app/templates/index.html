@@ -14,6 +14,7 @@
         {% for post in posts %}
             <li style="margin-top: 30px;">
                 <h2><a style="color: black;" href="{{ post.url }}">{{ post.get_title() }}</a></h2>
+                <p class="text-secondary" >{{ post.get_read_time() }} min read</p>
                 {{ post.get_excerpt() | safe }}
                 <p class="text-secondary float-right" >{{ post.get_print_date() }}</p>
                 <a href="{{ post.url }}">Read more...</a>
