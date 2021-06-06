@@ -120,6 +120,10 @@ class Page(S3File):
     metadata = None
     raw_md = None
     bucket_prefix = 'pages'
+    read_time = 2
+
+    def get_read_time(self):
+        return self.read_time
 
     def __init__(self, url, raw_md, last_modified, bucket_prefix='pages'):
         self.bucket_prefix = bucket_prefix
@@ -129,7 +133,10 @@ class Page(S3File):
             md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         else:
             md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-        self.html = md.convert(raw_md)
+        self.read_time = (len(self.raw_md.split())//200)+1
+
+        self.html = md.convert(raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
+        
         self.metadata = md.Meta
 
     def is_page(self):
@@ -284,10 +291,6 @@ class Page(S3File):
 
 class Post(Page):
     bucket_prefix = 'posts'
-    read_time = 2
-
-    def get_read_time(self):
-        return self.read_time
 
     def is_page(self):
         return False
@@ -331,8 +334,6 @@ class Post(Page):
                 if limit>=0 and count<page*limit:
                     count += 1
                     continue
-                
-                post.read_time = (len(post.raw_md.split())//200)+1
 
                 posts.append(post)
                 count += 1
