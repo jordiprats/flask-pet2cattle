@@ -152,26 +152,3 @@ except Exception as e:
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
 
-try:
-    post2time = {}
-
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-        post2time[post.get_url] = (len(post.raw_md.split())//200)+1
-
-    print(str(post2time))
-
-    tmp_p2t = tempfile.TemporaryFile()
-
-    pickle.dump(post2time, tmp_p2t)
-    tmp_p2t.seek(os.SEEK_SET)
-
-    p2t_idx = app.models.S3File('indexes', 'post2time.dict')
-    p2t_idx.save(tmp_c2t)
-
-
-    print("post2time.dict OK")
-except Exception as e:
-    print("Error generant cat2tag.dict: "+str(e))
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    print(exc_type, fname, exc_tb.tb_lineno)
