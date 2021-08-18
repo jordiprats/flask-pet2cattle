@@ -44,11 +44,11 @@ do
     mkdir repo
     git clone "${POSTS_REPO}" repo
 
-    rclone sync repo/favicon.ico         "minio:${MINIO_BUCKET}"
-    rclone sync repo/posts          "minio:${MINIO_BUCKET}/posts"
-    rclone sync repo/pages          "minio:${MINIO_BUCKET}/pages"
-    rclone sync repo/static          "minio:${MINIO_BUCKET}/static"
-    rclone sync repo/redirects      "minio:${MINIO_BUCKET}/redirects"
+    rclone sync repo/favicon.ico "minio:${MINIO_BUCKET}"
+    rclone sync repo/posts       "minio:${MINIO_BUCKET}/posts"
+    rclone sync repo/pages       "minio:${MINIO_BUCKET}/pages"
+    rclone sync repo/static      "minio:${MINIO_BUCKET}/static"
+    rclone sync repo/redirects   "minio:${MINIO_BUCKET}/redirects"
 
     # random sleep between 30 an 39 minutes
     sleep "$(echo "$(echo $RANDOM | grep -Eo "[0-9]$")+30" | bc -l)"m

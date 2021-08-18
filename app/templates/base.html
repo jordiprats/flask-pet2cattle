@@ -12,6 +12,11 @@
   <meta name="description" content="{{ post_metadata['summary'][0] }}">
   <meta property="og:description" content="{{ post_metadata['summary'][0] }}">
   {% endif %}
+  {% if post_metadata['image'] %}
+  <meta property="og:image" content="{{ post_metadata['image'] }}">
+  {% endif %}
+  <meta property="og:title" content="{{ post_metadata['title'][0] }}">
+  <meta property="og:url" content="{{ page_url }}">
 
   {% if post_metadata['robots'] %}
   <meta name="Robots" content="{{ post_metadata['robots'] }}" />
@@ -20,10 +25,6 @@
   {% endif %}
 
 	<meta name="keywords" content="{{ post_metadata['keywords'][0] }}">  
-
-  <meta property="og:title" content="{{ post_metadata['title'][0] }}">
-  <!-- <meta property="og:image" content="http://pet2cattle.com/dsadsada.jpg"> -->
-  <meta property="og:url" content="{{ page_url }}">
 
   <link rel="alternate" type="application/rss+xml" title="RSS Feed for pet2cattle.com" href="https://pet2cattle.com/feed.rss" />
 

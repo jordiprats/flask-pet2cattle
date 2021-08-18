@@ -67,6 +67,15 @@ class S3File:
 
         return s3_client.get_object(Bucket=MINIO_BUCKET, Key=self.base_object+'/'+self.url)['Body']
 
+    def exists(self):
+        global MINIO_BUCKET, s3_client
+        init_s3_client()
+
+        try:
+            return s3_client.head_object(Bucket=MINIO_BUCKET, Key=self.base_object+'/'+self.url)
+        except:
+            return False
+
     def save(self, filehandle):
         global MINIO_BUCKET, s3_client
         init_s3_client()
@@ -138,6 +147,23 @@ class Page(S3File):
         self.html = md.convert(raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
         
         self.metadata = md.Meta
+
+        try:
+            if not self.metadata['image']:
+                raise Exception("image empty")
+        except:
+            print(str(self.metadata))
+            try:
+                # TODO: check other default paths?
+                for category in self.metadata['categories']:
+                    category_image = S3File('static', 'categories/'+category.lower()+'.jpg')
+                    if category_image.exists():
+                        self.metadata['image'] = "https://static.pet2cattle.com/"+category_image.url
+                    else:
+                        print(category_image.url+" does not exists")
+            except:
+                pass
+        print(str(self.metadata))
 
     def is_page(self):
             return True
