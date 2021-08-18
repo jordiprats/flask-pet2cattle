@@ -156,7 +156,7 @@ class Page(S3File):
             try:
                 # TODO: check other default paths?
                 for category in self.metadata['categories']:
-                    category_image = S3File('static', 'categories/'+category.lower()+'.jpg')
+                    category_image = S3File('static', 'categories/'+category.lower()+'_small.jpg')
                     if category_image.exists():
                         self.metadata['image'] = "https://static.pet2cattle.com/"+category_image.url
                     else:
