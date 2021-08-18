@@ -159,11 +159,8 @@ class Page(S3File):
                     category_image = S3File('static', 'categories/'+category.lower()+'_small.jpg')
                     if category_image.exists():
                         self.metadata['image'] = "https://static.pet2cattle.com/"+category_image.url
-                    else:
-                        print(category_image.url+" does not exists")
             except:
                 pass
-        print(str(self.metadata))
 
     def is_page(self):
             return True
