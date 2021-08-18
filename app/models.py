@@ -133,7 +133,7 @@ class Page(S3File):
             md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
         else:
             md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta'])
-        self.read_time = (len(self.raw_md.split())//150)+1
+        self.read_time = (len(self.raw_md.split())//200)+1
 
         self.html = md.convert(raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
         
