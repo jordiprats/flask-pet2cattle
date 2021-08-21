@@ -57,7 +57,7 @@
           {% for title, item in navigation.items() %}
             {% if item['is_page'] %}
               <li class="nav-item active">
-                <a class="nav-link" href="/{{ item['url'] }}">{{ title }}</a>
+                <a class="nav-link" href="{{ item['url'] }}">{{ title }}</a>
               </li>
             {% else %}
             <li class="nav-item dropdown active">
