@@ -54,17 +54,19 @@
           <li class="nav-item active">
             <a class="nav-link" href="/">Home</a>
           </li>
-          {% for item in navigation %}
-            {% if item[0] is string %}
+          {% for title, item in navigation.items() %}
+            {% if item['is_page'] %}
               <li class="nav-item active">
-                <a class="nav-link" href="/{{ item[0] }}">{{ item[1] }}</a>
+                <a class="nav-link" href="/{{ item['url'] }}">{{ title }}</a>
               </li>
             {% else %}
             <li class="nav-item dropdown active">
-              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ item[0][0] }}</a>
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ title }}</a>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="/{{ item[0][0] }}/{{ item[0][1] }}">{{ item[1] }}</a>
-              </div>
+              {% for page in item['subpages'] %}
+                <a class="dropdown-item" href="{{ page['url'] }}">{{ page['title'] }}</a>
+              {% endfor %}
+            </div>
             </li>
             {% endif %}
           {% endfor %}

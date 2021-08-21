@@ -55,20 +55,38 @@ md = Markdown(app,
 
 @cache.cached(timeout=86400, key_prefix="get_navigation")
 def get_navigation():
+    if DEBUG:
+        print('get_navigation')
+
     page_urls = models.Page.urls()
 
-    nav = []
+    nav = {}
 
     for page_url in page_urls:
         if DEBUG:
             print('/'+page_url)
             print(str(models.Page.filter('/'+page_url)))
         if '/' in page_url:
-            # TODO: multiples subpagines?
-            nav.append([page_url.split('/'), models.Page.filter('/'+page_url)[0].get_title()])
-        else:
-            nav.append([page_url, models.Page.filter('/'+page_url)[0].get_title()])
+            # TODO: definir una manera de ordernar categories/pagines
+            # [
+            #     [['terraform', 'hashicorp-certified-terraform-associate'], 'HashiCorp Certified Terraform Associate Study Guide\n'], 
+            #     [['kubernetes', 'object-reference'], 'Kubernetes Object reference\n'], 
+            #     [['kubernetes', 'kubectl-reference'], 'kubectl reference'], 
+            #     [['kubernetes', 'cka'], 'Certified Kubernetes Administrator Study Guide\n'], 
+            #     ['about', 'About pet2cattle\n'], 
+            #     [['aws', 'certified-solutions-architect-associate-saa-c02'], 'AWS Certified Solutions Architect Associate SAA-C02\n']
+            # ]
+            category = page_url.split('/')[0]
+            page = page_url.split('/')[1]
 
+            if category not in nav.keys():
+                nav[category] = { 'is_page': False, 'subpages': [] }
+
+            nav[category]['subpages'].append({ 'is_page': True, 'url': '/'+category+'/'+page, 'title': models.Page.filter('/'+page_url)[0].get_title() })
+        else:
+            nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title() }
+
+    print(str(nav))
     return nav
 
 @app.route('/static/<file_category>/<filename>')
