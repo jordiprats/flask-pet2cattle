@@ -160,8 +160,8 @@ try:
       if slugify(category) not in cat2relatedcats.keys():
         cat2relatedcats[category] = []
       for related_cat in post.get_categories():
-        # TODO: afegir pes i evitar duplicades
         if category != related_cat:
+          # TODO: afegir pes i evitar duplicades
           cat2relatedcats[category].append(related_cat)
 
   tmp_c2rc = tempfile.TemporaryFile()
