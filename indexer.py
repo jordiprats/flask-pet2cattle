@@ -158,11 +158,14 @@ try:
   for post in app.models.Post.all(page=0, limit=-1)['Posts']:
     for category in post.get_categories():
       if slugify(category) not in cat2relatedcats.keys():
-        cat2relatedcats[category] = []
+        cat2relatedcats[slugify(category)] = {}
       for related_cat in post.get_categories():
         if category != related_cat:
-          # TODO: afegir pes i evitar duplicades
-          cat2relatedcats[category].append(related_cat)
+          if slugify(related_cat) not in cat2relatedcats[slugify(category)].keys():
+            cat2relatedcats[slugify(category)][slugify(related_cat)] = { 'title': related_cat, 'weight': 1, 'url': '/categories/'+slugify(related_cat)}
+          else:
+            cat2relatedcats[slugify(category)][slugify(related_cat)]['weight'] += 1
+          # cat2relatedcats[category].append(related_cat)
 
   tmp_c2rc = tempfile.TemporaryFile()
 
@@ -175,7 +178,7 @@ try:
   print("cat2relatedcats.dict OK")
   
 except Exception as e:
-  print("Error generant cat2tag.dict: "+str(e))
+  print("Error generant cat2relatedcats.dict: "+str(e))
   exc_type, exc_obj, exc_tb = sys.exc_info()
   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   print(exc_type, fname, exc_tb.tb_lineno)

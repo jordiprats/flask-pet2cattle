@@ -53,6 +53,18 @@ md = Markdown(app,
               output_format='html4',
              )
 
+@cache.cached(timeout=7200, key_prefix="get_related_categories")
+def get_related_categories(category):
+    try:
+        print("get_related_categories")
+        related_categories = [ pickle.loads(models.S3File('indexes', 'cat2relatedcats.dict').get_data().read())[slugify(category)][related_cat] for related_cat in pickle.loads(models.S3File('indexes', 'cat2relatedcats.dict').get_data().read())[slugify(category)].keys() ]
+        print(str(related_categories))
+        return related_categories
+    except Exception as e:
+        if DEBUG:
+            print(str(e))
+        return None
+
 @cache.cached(timeout=86400, key_prefix="get_navigation")
 def get_navigation():
     if DEBUG:
@@ -269,6 +281,17 @@ def categories(category, page):
 
             posts_urls = categories[category][page*5:page*5+5]
 
+            related_categories = []
+            other_related_categories = []
+
+            get_key_value = lambda obj: obj['weight']
+            for related_cat in sorted(get_related_categories(category), key=get_key_value, reverse=True)[:3]:
+                related_categories.append(related_cat)
+
+            for related_cat in sorted(get_related_categories(category), key=get_key_value, reverse=False)[:3]:
+                if related_cat not in related_categories:
+                    other_related_categories.append(related_cat)
+
             if not posts_urls:
                 abort(404)
 
@@ -287,6 +310,8 @@ def categories(category, page):
                                                 page_number=page,
                                                 has_next=categories[category][(page+1)*10:(page+1)*10+10],
                                                 has_previous=page>0,
+                                                principal_related_posts=related_categories,
+                                                other_related_posts=other_related_categories,
                                                 navigation=get_navigation(),
                                                 tag_cloud=None,
                                                 cat2tag=cat2tag[category]
