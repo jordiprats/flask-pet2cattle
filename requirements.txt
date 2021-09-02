@@ -2,7 +2,9 @@ python-slugify
 Flask-Markdown
 Flask-Caching
 Pygments
+requests
 PyYAML
 flask
 boto3
-pytz
+pytz 
+bs4
