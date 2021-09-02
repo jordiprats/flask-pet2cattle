@@ -34,7 +34,7 @@ def get_all_website_links(url):
 try:
   website = sys.argv[1]
 except:
-  website = 'https://pet2cattle.com'
+  website = 'http://127.0.0.1:8000/'
 
 for url in get_all_website_links(website):
   print(url)
