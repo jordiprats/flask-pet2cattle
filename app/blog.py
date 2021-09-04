@@ -407,7 +407,7 @@ def index(page):
     if page!=0:
         page_metadata['robots']='noindex,follow'
     page_metadata['keywords']=['kubernetes, helm, terraform, pet vs cattle']
-    page_metadata['summary']=['Treat your clusters like cattle, not pets by learning how to use kubernetes, helm and terraform']
+    page_metadata['summary']=['Treat your clusters like cattle, not pets by using kubernetes, helm and terraform']
 
     response = models.Post.all(page, 5)
 
