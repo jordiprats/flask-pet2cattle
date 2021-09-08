@@ -4,6 +4,7 @@ from datetime import datetime
 from slugify import slugify
 
 import markdown
+import pickle
 import boto3
 import pytz
 import math
@@ -134,6 +135,46 @@ class Page(S3File):
   def get_read_time(self):
     return self.read_time
 
+  def autopage(self):
+    autopage_matcher = re.compile('\[autopage:([a-z]+)\]')
+    matchs = autopage_matcher.search(self.raw_md)
+
+    if matchs:
+      if DEBUG:
+        print("AUTOPAGE MATCH: "+matchs.group(1))
+      try:
+        md_autopage = ''
+        autopage_dict = pickle.loads(S3File('indexes', 'autopage.dict').get_data().read())
+
+        print("AUTOPAGE DICT: "+str(autopage_dict))
+        if 'unsorted' in autopage_dict[matchs.group(1)].keys():
+          for post in autopage_dict[matchs.group(1)]['unsorted']:
+            md_autopage += '* ['+post['title']+']('+post['url']+')\n'
+        
+        for category in autopage_dict[matchs.group(1)].keys():
+          if category == 'unsorted':
+            continue
+          
+          md_autopage += "## "+category+'\n'
+
+          for post in autopage_dict[matchs.group(1)][category]:
+            md_autopage += '* ['+post['title']+']('+post['url']+')\n'
+
+
+        if DEBUG:
+          print('AUTOPAGE: '+md_autopage)
+        self.raw_md = re.sub('\[autopage:([a-z]+)\]', md_autopage, self.raw_md)
+
+
+
+      except Exception as e:
+        self.raw_md = re.sub('\[autopage:([a-z]+)\]', '', self.raw_md)
+        if DEBUG:
+          print(str(e))
+        pass
+
+      self.refresh_markdown()
+
   def refresh_markdown(self):
     md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
     self.read_time = (len(self.raw_md.split())//200)+1
@@ -227,6 +268,16 @@ class Page(S3File):
     except:
       return []
 
+  def get_autopages(self):
+    try:
+      keywords = []
+      for keyword in self.metadata['autopage'][0].split(','):
+        keywords.append(keyword.strip())
+      return keywords
+    except:
+      return []
+
+
   def get_tags(self):
     try:
       keywords = []
@@ -263,6 +314,15 @@ class Page(S3File):
     except:
       pass
     return self.metadata['title'][0]
+  
+  def get_short_title(self):
+    return self.metadata['title'][0]
+
+  def get_metadata(self, key):
+    try:
+      return self.metadata[key][0]
+    except:
+      return ''
 
   def filter(url):
     global MINIO_BUCKET, s3_client

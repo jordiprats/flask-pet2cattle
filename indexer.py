@@ -182,3 +182,39 @@ except Exception as e:
   exc_type, exc_obj, exc_tb = sys.exc_info()
   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   print(exc_type, fname, exc_tb.tb_lineno)
+
+try:
+  autopage = {}
+
+  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for autopage_instance in post.get_autopages():     
+      if autopage_instance not in autopage.keys():
+        autopage[autopage_instance] = {}
+
+      autopage_category = post.get_metadata('autopage_category')
+
+      if not autopage_category:
+        autopage_category = 'unsorted'
+
+      if autopage_category not in autopage[autopage_instance].keys():
+        autopage[autopage_instance][autopage_category] = []
+
+      autopage[autopage_instance][autopage_category].append({ 'title': post.get_short_title(), 'url': post.get_url() })
+
+  print(str(autopage))
+
+  tmp_autopage = tempfile.TemporaryFile()
+
+  pickle.dump(autopage, tmp_autopage)
+  tmp_autopage.seek(os.SEEK_SET)
+
+  autopage_idx = app.models.S3File('indexes', 'autopage.dict')
+  autopage_idx.save(tmp_autopage)
+
+  print("autopage_idx.dict OK")
+
+except Exception as e:
+  print("Error generant autopage_idx.dict: "+str(e))
+  exc_type, exc_obj, exc_tb = sys.exc_info()
+  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+  print(exc_type, fname, exc_tb.tb_lineno)

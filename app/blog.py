@@ -56,9 +56,9 @@ md = Markdown(app,
 @cache.cached(timeout=7200, key_prefix="get_related_categories")
 def get_related_categories(category):
   try:
-    print("get_related_categories")
+    if DEBUG:
+      print("get_related_categories")
     related_categories = [ pickle.loads(models.S3File('indexes', 'cat2relatedcats.dict').get_data().read())[slugify(category)][related_cat] for related_cat in pickle.loads(models.S3File('indexes', 'cat2relatedcats.dict').get_data().read())[slugify(category)].keys() ]
-    print(str(related_categories))
     return related_categories
   except Exception as e:
     if DEBUG:
@@ -98,7 +98,6 @@ def get_navigation():
     else:
       nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title() }
 
-  print(str(nav))
   return nav
 
 @app.route('/static/<file_category>/<filename>')
@@ -186,8 +185,6 @@ def tags(tag, page):
   if DEBUG:
     print('tags')
   tags = get_posts_tags()
-
-  print(str(tags))
 
   if not tags:
     abort(404)
@@ -412,7 +409,8 @@ def index(page):
   response = models.Post.all(page, 5)
 
   if len(response['Posts'])==0:
-    print('empty')
+    if DEBUG:
+      print('empty')
     abort(404)
 
   return render_template('index.html', 
@@ -440,6 +438,9 @@ def catch_all(path):
     if page.is_published() or FORCE_PUBLISH:
       if DEBUG:
         print('is page')
+      
+      # generate dynamic content
+      page.autopage()
       return render_template('page.html',
                         single=True, 
                         post_html=page.html, 
