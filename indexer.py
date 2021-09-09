@@ -199,7 +199,19 @@ try:
       if autopage_category not in autopage[autopage_instance].keys():
         autopage[autopage_instance][autopage_category] = []
 
-      autopage[autopage_instance][autopage_category].append({ 'title': post.get_short_title(), 'url': post.get_url() })
+      autopage_post = { 'url': post.get_url() }
+
+      if post.get_metadata('autopage_title'):
+        autopage_post['title'] = post.get_metadata('autopage_title')
+      else:
+        autopage_post['title'] = post.get_short_title()
+
+      if post.get_metadata('autopage_description'):
+        autopage_post['description'] = post.get_metadata('autopage_description')
+      else:
+        autopage_post['description'] = post.get_metadata('Summary')
+
+      autopage[autopage_instance][autopage_category].append(autopage_post)
 
   print(str(autopage))
 
