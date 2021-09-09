@@ -209,7 +209,7 @@ try:
       if post.get_metadata('autopage_description'):
         autopage_post['description'] = post.get_metadata('autopage_description')
       else:
-        autopage_post['description'] = post.get_metadata('Summary')
+        autopage_post['description'] = post.get_metadata('summary')
 
       autopage[autopage_instance][autopage_category].append(autopage_post)
 

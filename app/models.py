@@ -146,10 +146,13 @@ class Page(S3File):
         md_autopage = ''
         autopage_dict = pickle.loads(S3File('indexes', 'autopage.dict').get_data().read())
 
-        print("AUTOPAGE DICT: "+str(autopage_dict))
         if 'unsorted' in autopage_dict[matchs.group(1)].keys():
           for post in autopage_dict[matchs.group(1)]['unsorted']:
-            md_autopage += '* ['+post['title']+']('+post['url']+')\n'
+            md_autopage += '* ['+post['title']+']('+post['url']+')'
+            if post['description']:
+              md_autopage += ': '+post['description']+'\n'
+            else:
+              md_autopage += '\n'
         
         for category in autopage_dict[matchs.group(1)].keys():
           if category == 'unsorted':
@@ -158,14 +161,15 @@ class Page(S3File):
           md_autopage += "## "+category+'\n'
 
           for post in autopage_dict[matchs.group(1)][category]:
-            md_autopage += '* ['+post['title']+']('+post['url']+')\n'
-
+            md_autopage += '* ['+post['title']+']('+post['url']+')'
+            if post['description']:
+              md_autopage += ': '+post['description']+'\n'
+            else:
+              md_autopage += '\n'
 
         if DEBUG:
           print('AUTOPAGE: '+md_autopage)
         self.raw_md = re.sub('\[autopage:([a-z]+)\]', md_autopage, self.raw_md)
-
-
 
       except Exception as e:
         self.raw_md = re.sub('\[autopage:([a-z]+)\]', '', self.raw_md)
