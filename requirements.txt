@@ -5,6 +5,7 @@ Pygments
 requests
 PyYAML
 flask
+emoji
 boto3
 pytz 
 bs4
