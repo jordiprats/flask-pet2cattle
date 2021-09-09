@@ -94,7 +94,7 @@ def get_navigation():
       if category not in nav.keys():
         nav[category] = { 'is_page': False, 'subpages': [] }
 
-      nav[category]['subpages'].append({ 'is_page': True, 'url': '/'+category+'/'+page, 'title': models.Page.filter('/'+page_url)[0].get_title() })
+      nav[category]['subpages'].append({ 'is_page': True, 'url': '/'+category+'/'+page, 'title': models.Page.filter('/'+page_url)[0].get_short_title() })
     else:
       nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title() }
 
