@@ -129,7 +129,6 @@ def get_navigation():
 
 @app.route('/search/', defaults={'page': 0})
 @app.route('/search/page/<int:page>')
-@cache.cached(timeout=86400)
 def search(page):
   if DEBUG:
     print('search')
@@ -144,7 +143,10 @@ def search(page):
   page_metadata['keywords']=[' '.join(search_string)]
   page_metadata['summary']=['Treat your clusters like cattle, not pets by using kubernetes, helm and terraform']
 
-  response = models.Post.search(search_string, fulltext_index, page, 5)
+  response = cache.get("search_full_text_"+search_string)
+  if not response:
+    response = models.Post.search(search_string, fulltext_index, page, 5)
+    cache.set("search_full_text_"+search_string, response)
 
   if len(response['Posts'])==0:
     if DEBUG:
