@@ -151,7 +151,10 @@ def search(page):
   if len(response['Posts'])==0:
     if DEBUG:
       print('empty')
-    abort(404)
+    response = cache.get("search_full_text_pet2cattle")
+    if not response:
+      response = models.Post.search('pet2cattle', fulltext_index, page, 5)
+      cache.set("search_full_text_pet2cattle", response)
 
   return render_template('index.html', 
                     single=False,
