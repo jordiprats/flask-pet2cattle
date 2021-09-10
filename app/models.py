@@ -408,15 +408,16 @@ class Post(Page):
         results = s.search_page(q, page+1, pagelen=limit)
         print("Search Results: ")
         if results:
+          if len(results)==limit:
+            try:
+              if len(s.search_page(q, page+2, pagelen=limit)) > 0:
+                data['next'] = True
+            except:
+              pass      
           for hit in results:
             post = Post.getURL(hit['path'])
             if post:
               data['Posts'].append(post[0])
-          try:
-            if s.search_page(q, page+2, pagelen=limit):
-              data['next'] = True
-          except:
-            pass
     return data
 
   def all(page=0, limit=5, prefix=None):
