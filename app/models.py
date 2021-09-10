@@ -2,6 +2,7 @@ from botocore.client import Config
 
 from datetime import datetime
 from slugify import slugify
+from whoosh import qparser
 
 import markdown
 import pickle
@@ -322,6 +323,13 @@ class Page(S3File):
   def get_short_title(self):
     return self.metadata['title'][0]
 
+  def get_raw_md(self):
+    if self.is_page():
+      self.autopage()
+      return self.raw_md
+    else:
+      return self.raw_md
+
   def get_metadata(self, key):
     try:
       return self.metadata[key][0]
@@ -385,6 +393,31 @@ class Post(Page):
 
   def __init__(self, url, raw_md, last_modified):
     super().__init__( url, raw_md, last_modified, Post.bucket_prefix)
+
+  def search(search_query, fulltext_index, page=0, limit=10):
+    data = {}
+    data['next'] = False
+    data['Posts'] = []
+    data['page'] = page
+
+    og = qparser.OrGroup.factory(0.9)
+    mp = qparser.MultifieldParser(['title','content'], fulltext_index.schema, group = og)
+    q = mp.parse(search_query)
+    
+    with fulltext_index.searcher() as s:
+        results = s.search_page(q, page+1, pagelen=limit)
+        print("Search Results: ")
+        if results:
+          for hit in results:
+            post = Post.getURL(hit['path'])
+            if post:
+              data['Posts'].append(post[0])
+          try:
+            if s.search_page(q, page+2, pagelen=limit):
+              data['next'] = True
+          except:
+            pass
+    return data
 
   def all(page=0, limit=5, prefix=None):
     global MINIO_BUCKET, s3_client

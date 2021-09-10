@@ -1,4 +1,9 @@
+from whoosh.filedb.filestore import FileStorage
+from whoosh.analysis import StemmingAnalyzer
+from whoosh.fields import Schema, ID, TEXT
+
 from slugify import slugify
+from whoosh import index
 
 import app.models
 
@@ -8,225 +13,277 @@ import pickle
 import sys
 import os
 
-try:
-  categories = {}
+FULLTEXT_INDEX_PATH = os.getenv('FULLTEXT_INDEX_PATH', "whoosh")
 
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for category in post.get_categories():
-      if slugify(category) in categories.keys():
-        categories[slugify(category)].append(post.url)
-      else:
-        categories[slugify(category)]=[post.url]
+def getFTschema():
+  return Schema(
+                path=ID(stored=True,unique=True), 
+                content=TEXT(analyzer=StemmingAnalyzer()), 
+                title=TEXT(analyzer=StemmingAnalyzer()), 
+                keywords=TEXT
+              )
 
-  tmp_categories = tempfile.TemporaryFile()
+if __name__ == "__main__":
+  try:
+    categories = {}
 
-  pickle.dump(categories, tmp_categories)
-  tmp_categories.seek(os.SEEK_SET)
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for category in post.get_categories():
+        if slugify(category) in categories.keys():
+          categories[slugify(category)].append(post.url)
+        else:
+          categories[slugify(category)]=[post.url]
 
-  categories_idx = app.models.S3File('indexes', 'categories.dict')
-  categories_idx.save(tmp_categories)
+    tmp_categories = tempfile.TemporaryFile()
 
-  print("categories.dict OK")
-except Exception as e:
-  print("Error generant categories.dict: "+str(e))
+    pickle.dump(categories, tmp_categories)
+    tmp_categories.seek(os.SEEK_SET)
 
-try:
-  tags = {}
+    categories_idx = app.models.S3File('indexes', 'categories.dict')
+    categories_idx.save(tmp_categories)
 
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for tag in post.get_tags():
-      if slugify(tag) in tags.keys():
-        tags[slugify(tag)].append(post.url)
-      else:
-        tags[slugify(tag)]=[post.url]
+    print("categories.dict OK")
+  except Exception as e:
+    print("Error generant categories.dict: "+str(e))
 
-  tmp_tags = tempfile.TemporaryFile()
+  try:
+    tags = {}
 
-  pickle.dump(tags, tmp_tags)
-  tmp_tags.seek(os.SEEK_SET)
-
-  tags_idx = app.models.S3File('indexes', 'tags.dict')
-  tags_idx.save(tmp_tags)
-
-  print("tags.dict OK")
-except Exception as e:
-  print("Error generant tags.dict: "+str(e))
-
-try:
-  ordered_tag_cloud = {}
-  tag_cloud = {}
-
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for tag in post.get_tags():
-      ordered_tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
-
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for category in post.get_categories():
-      ordered_tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
-
-  count = 0
-  sum = 0
-  to_delete = []
-  tag_keys = list(ordered_tag_cloud.keys())
-  random.shuffle(tag_keys)
-  for tag in tag_keys:
-    if ordered_tag_cloud[tag]['count']!=1:
-      tag_cloud[tag] = ordered_tag_cloud[tag]
-      count += 1
-      sum += tag_cloud[tag]['count']
-  
-  mean = sum/count
-  # print(mean)
-
-  for tag in tag_cloud.keys():
-    if tag_cloud[tag]['count'] > mean+(mean/2):
-      tag_cloud[tag]['size'] = "h2"
-    elif tag_cloud[tag]['count'] > mean:
-      tag_cloud[tag]['size'] = "h3"
-    elif tag_cloud[tag]['count'] > mean-(mean/2):
-      tag_cloud[tag]['size'] = "h5"
-    else:
-      tag_cloud[tag]['size'] = "h6"
-
-  tmp_tagcloud = tempfile.TemporaryFile()
-
-  pickle.dump(tag_cloud, tmp_tagcloud)
-  tmp_tagcloud.seek(os.SEEK_SET)
-
-  tagcloud_idx = app.models.S3File('indexes', 'tag_cloud.dict')
-  tagcloud_idx.save(tmp_tagcloud)
-
-  print("tag_cloud.dict OK")
-except Exception as e:
-  print("Error generant tag_cloud.dict: "+str(e))
-  exc_type, exc_obj, exc_tb = sys.exc_info()
-  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-  print(exc_type, fname, exc_tb.tb_lineno)
-
-try:
-  cat2tag = {}
-
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for category in post.get_categories():
-      if slugify(category) in cat2tag.keys():
-        tags = cat2tag[slugify(category)]
-      else:
-        tags = {}
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
       for tag in post.get_tags():
-        if tag in tags.keys():
-          tags[tag] = { 'count': tags[tag]['count']+1, 'url': '/tags/'+slugify(tag)}
+        if slugify(tag) in tags.keys():
+          tags[slugify(tag)].append(post.url)
         else:
-          tags[tag] = { 'count': 1, 'url': '/tags/'+slugify(tag)}
-      cat2tag[slugify(category)] = tags
+          tags[slugify(tag)]=[post.url]
 
-      count = 0
-      sum = 0
-      for tag in cat2tag[slugify(category)].keys():
+    tmp_tags = tempfile.TemporaryFile()
+
+    pickle.dump(tags, tmp_tags)
+    tmp_tags.seek(os.SEEK_SET)
+
+    tags_idx = app.models.S3File('indexes', 'tags.dict')
+    tags_idx.save(tmp_tags)
+
+    print("tags.dict OK")
+  except Exception as e:
+    print("Error generant tags.dict: "+str(e))
+
+  try:
+    ordered_tag_cloud = {}
+    tag_cloud = {}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for tag in post.get_tags():
+        ordered_tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for category in post.get_categories():
+        ordered_tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
+
+    count = 0
+    sum = 0
+    to_delete = []
+    tag_keys = list(ordered_tag_cloud.keys())
+    random.shuffle(tag_keys)
+    for tag in tag_keys:
+      if ordered_tag_cloud[tag]['count']!=1:
+        tag_cloud[tag] = ordered_tag_cloud[tag]
         count += 1
-        sum += cat2tag[slugify(category)][tag]['count']
-      
-      mean = sum/count
+        sum += tag_cloud[tag]['count']
+    
+    mean = sum/count
+    # print(mean)
 
-      for tag in cat2tag[slugify(category)].keys():
-        if cat2tag[slugify(category)][tag]['count'] > mean+(mean/2):
-          cat2tag[slugify(category)][tag]['size'] = "h2"
-        elif cat2tag[slugify(category)][tag]['count'] > mean:
-          cat2tag[slugify(category)][tag]['size'] = "h3"
-        elif cat2tag[slugify(category)][tag]['count'] > mean-(mean/2):
-          cat2tag[slugify(category)][tag]['size'] = "h5"
+    for tag in tag_cloud.keys():
+      if tag_cloud[tag]['count'] > mean+(mean/2):
+        tag_cloud[tag]['size'] = "h2"
+      elif tag_cloud[tag]['count'] > mean:
+        tag_cloud[tag]['size'] = "h3"
+      elif tag_cloud[tag]['count'] > mean-(mean/2):
+        tag_cloud[tag]['size'] = "h5"
+      else:
+        tag_cloud[tag]['size'] = "h6"
+
+    tmp_tagcloud = tempfile.TemporaryFile()
+
+    pickle.dump(tag_cloud, tmp_tagcloud)
+    tmp_tagcloud.seek(os.SEEK_SET)
+
+    tagcloud_idx = app.models.S3File('indexes', 'tag_cloud.dict')
+    tagcloud_idx.save(tmp_tagcloud)
+
+    print("tag_cloud.dict OK")
+  except Exception as e:
+    print("Error generant tag_cloud.dict: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+
+  try:
+    cat2tag = {}
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for category in post.get_categories():
+        if slugify(category) in cat2tag.keys():
+          tags = cat2tag[slugify(category)]
         else:
-          cat2tag[slugify(category)][tag]['size'] = "h6"
-
-  tmp_c2t = tempfile.TemporaryFile()
-
-  pickle.dump(cat2tag, tmp_c2t)
-  tmp_c2t.seek(os.SEEK_SET)
-
-  c2t_idx = app.models.S3File('indexes', 'cat2tag.dict')
-  c2t_idx.save(tmp_c2t)
-
-  print("cat2tag.dict OK")
-except Exception as e:
-  print("Error generant cat2tag.dict: "+str(e))
-  exc_type, exc_obj, exc_tb = sys.exc_info()
-  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-  print(exc_type, fname, exc_tb.tb_lineno)
-  
-try:
-  cat2relatedcats = {}
-
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for category in post.get_categories():
-      if slugify(category) not in cat2relatedcats.keys():
-        cat2relatedcats[slugify(category)] = {}
-      for related_cat in post.get_categories():
-        if category != related_cat:
-          if slugify(related_cat) not in cat2relatedcats[slugify(category)].keys():
-            cat2relatedcats[slugify(category)][slugify(related_cat)] = { 'title': related_cat, 'weight': 1, 'url': '/categories/'+slugify(related_cat)}
+          tags = {}
+        for tag in post.get_tags():
+          if tag in tags.keys():
+            tags[tag] = { 'count': tags[tag]['count']+1, 'url': '/tags/'+slugify(tag)}
           else:
-            cat2relatedcats[slugify(category)][slugify(related_cat)]['weight'] += 1
-          # cat2relatedcats[category].append(related_cat)
+            tags[tag] = { 'count': 1, 'url': '/tags/'+slugify(tag)}
+        cat2tag[slugify(category)] = tags
 
-  tmp_c2rc = tempfile.TemporaryFile()
+        count = 0
+        sum = 0
+        for tag in cat2tag[slugify(category)].keys():
+          count += 1
+          sum += cat2tag[slugify(category)][tag]['count']
+        
+        mean = sum/count
 
-  pickle.dump(cat2relatedcats, tmp_c2rc)
-  tmp_c2rc.seek(os.SEEK_SET)
+        for tag in cat2tag[slugify(category)].keys():
+          if cat2tag[slugify(category)][tag]['count'] > mean+(mean/2):
+            cat2tag[slugify(category)][tag]['size'] = "h2"
+          elif cat2tag[slugify(category)][tag]['count'] > mean:
+            cat2tag[slugify(category)][tag]['size'] = "h3"
+          elif cat2tag[slugify(category)][tag]['count'] > mean-(mean/2):
+            cat2tag[slugify(category)][tag]['size'] = "h5"
+          else:
+            cat2tag[slugify(category)][tag]['size'] = "h6"
 
-  c2rc_idx = app.models.S3File('indexes', 'cat2relatedcats.dict')
-  c2rc_idx.save(tmp_c2rc)
+    tmp_c2t = tempfile.TemporaryFile()
 
-  print("cat2relatedcats.dict OK")
-  
-except Exception as e:
-  print("Error generant cat2relatedcats.dict: "+str(e))
-  exc_type, exc_obj, exc_tb = sys.exc_info()
-  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-  print(exc_type, fname, exc_tb.tb_lineno)
+    pickle.dump(cat2tag, tmp_c2t)
+    tmp_c2t.seek(os.SEEK_SET)
 
-try:
-  autopage = {}
+    c2t_idx = app.models.S3File('indexes', 'cat2tag.dict')
+    c2t_idx.save(tmp_c2t)
 
-  for post in app.models.Post.all(page=0, limit=-1)['Posts']:
-    for autopage_instance in post.get_autopages():     
-      if autopage_instance not in autopage.keys():
-        autopage[autopage_instance] = {}
+    print("cat2tag.dict OK")
+  except Exception as e:
+    print("Error generant cat2tag.dict: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+    
+  try:
+    cat2relatedcats = {}
 
-      autopage_category = post.get_metadata('autopage_category')
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for category in post.get_categories():
+        if slugify(category) not in cat2relatedcats.keys():
+          cat2relatedcats[slugify(category)] = {}
+        for related_cat in post.get_categories():
+          if category != related_cat:
+            if slugify(related_cat) not in cat2relatedcats[slugify(category)].keys():
+              cat2relatedcats[slugify(category)][slugify(related_cat)] = { 'title': related_cat, 'weight': 1, 'url': '/categories/'+slugify(related_cat)}
+            else:
+              cat2relatedcats[slugify(category)][slugify(related_cat)]['weight'] += 1
+            # cat2relatedcats[category].append(related_cat)
 
-      if not autopage_category:
-        autopage_category = 'unsorted'
+    tmp_c2rc = tempfile.TemporaryFile()
 
-      if autopage_category not in autopage[autopage_instance].keys():
-        autopage[autopage_instance][autopage_category] = []
+    pickle.dump(cat2relatedcats, tmp_c2rc)
+    tmp_c2rc.seek(os.SEEK_SET)
 
-      autopage_post = { 'url': post.get_url() }
+    c2rc_idx = app.models.S3File('indexes', 'cat2relatedcats.dict')
+    c2rc_idx.save(tmp_c2rc)
 
-      if post.get_metadata('autopage_title'):
-        autopage_post['title'] = post.get_metadata('autopage_title')
-      else:
-        autopage_post['title'] = post.get_short_title()
+    print("cat2relatedcats.dict OK")
+    
+  except Exception as e:
+    print("Error generant cat2relatedcats.dict: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
 
-      if post.get_metadata('autopage_description'):
-        autopage_post['description'] = post.get_metadata('autopage_description')
-      else:
-        autopage_post['description'] = post.get_metadata('summary')
+  try:
+    autopage = {}
 
-      autopage[autopage_instance][autopage_category].append(autopage_post)
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      for autopage_instance in post.get_autopages():     
+        if autopage_instance not in autopage.keys():
+          autopage[autopage_instance] = {}
 
-  print(str(autopage))
+        autopage_category = post.get_metadata('autopage_category')
 
-  tmp_autopage = tempfile.TemporaryFile()
+        if not autopage_category:
+          autopage_category = 'unsorted'
 
-  pickle.dump(autopage, tmp_autopage)
-  tmp_autopage.seek(os.SEEK_SET)
+        if autopage_category not in autopage[autopage_instance].keys():
+          autopage[autopage_instance][autopage_category] = []
 
-  autopage_idx = app.models.S3File('indexes', 'autopage.dict')
-  autopage_idx.save(tmp_autopage)
+        autopage_post = { 'url': post.get_url() }
 
-  print("autopage_idx.dict OK")
+        if post.get_metadata('autopage_title'):
+          autopage_post['title'] = post.get_metadata('autopage_title')
+        else:
+          autopage_post['title'] = post.get_short_title()
 
-except Exception as e:
-  print("Error generant autopage_idx.dict: "+str(e))
-  exc_type, exc_obj, exc_tb = sys.exc_info()
-  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-  print(exc_type, fname, exc_tb.tb_lineno)
+        if post.get_metadata('autopage_description'):
+          autopage_post['description'] = post.get_metadata('autopage_description')
+        else:
+          autopage_post['description'] = post.get_metadata('summary')
+
+        autopage[autopage_instance][autopage_category].append(autopage_post)
+
+    print(str(autopage))
+
+    tmp_autopage = tempfile.TemporaryFile()
+
+    pickle.dump(autopage, tmp_autopage)
+    tmp_autopage.seek(os.SEEK_SET)
+
+    autopage_idx = app.models.S3File('indexes', 'autopage.dict')
+    autopage_idx.save(tmp_autopage)
+
+    print("autopage_idx.dict OK")
+
+  except Exception as e:
+    print("Error generant autopage_idx.dict: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+
+  #
+  # full text search
+  #
+
+  try:
+    if not os.path.exists(FULLTEXT_INDEX_PATH):
+        os.makedirs(FULLTEXT_INDEX_PATH, exist_ok=True)
+
+    idx_storage = FileStorage(FULLTEXT_INDEX_PATH)
+
+    if not index.exists_in(FULLTEXT_INDEX_PATH):
+      print('creating new whoosh index')
+      schema = getFTschema()
+      idx = index.create_in(FULLTEXT_INDEX_PATH, schema)
+    else:
+      idx = idx_storage.open_index()
+
+    idx_writer = idx.writer()
+
+    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+      keywords = " ".join(post.get_categories())+' '+" ".join(post.get_keywords())+' '+" ".join(post.get_tags())
+      # print(keywords)
+      idx_writer.update_document(
+                                  path=post.get_url(), 
+                                  content=post.get_raw_md().lower(), 
+                                  title=post.get_title().lower(),
+                                  keywords=keywords, 
+                                )
+
+    # TODO: pàgines a indexar? per exemple CKA
+
+    idx_writer.commit()
+
+    print("full text search index (whoosh) OK")
+
+  except Exception as e:
+    print("Error generant ull text search index: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)

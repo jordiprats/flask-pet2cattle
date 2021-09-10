@@ -4,6 +4,7 @@ Flask-Caching
 Pygments
 requests
 PyYAML
+whoosh
 flask
 boto3
 pytz 

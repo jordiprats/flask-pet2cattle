@@ -6,13 +6,19 @@ from flask import send_from_directory
 from flask import render_template
 from flask import make_response
 from flask import redirect
+from flask import request
 from flask import abort
+
+from whoosh.filedb.filestore import FileStorage
+from whoosh import index
 
 from datetime import datetime
 from slugify import slugify
 
 from app import models
 from app import app
+
+import indexer
 
 import markdown
 import pickle
@@ -53,6 +59,26 @@ md = Markdown(app,
         output_format='html4',
        )
 
+FULLTEXT_INDEX_PATH = os.getenv('FULLTEXT_INDEX_PATH', "whoosh")
+
+search_enabled = False
+try:
+  if not os.path.exists(FULLTEXT_INDEX_PATH):
+      os.makedirs(FULLTEXT_INDEX_PATH, exist_ok=True)
+
+  if index.exists_in(FULLTEXT_INDEX_PATH):
+    search_enabled = True
+    storage = FileStorage(FULLTEXT_INDEX_PATH)
+    fulltext_index = storage.open_index()
+except Exception as e:
+  if DEBUG:
+    print('whoosh index error: '+str(e))
+  pass
+
+if DEBUG:
+  print('search_enabled: '+str(search_enabled))
+
+
 @cache.cached(timeout=7200, key_prefix="get_related_categories")
 def get_related_categories(category):
   try:
@@ -75,9 +101,6 @@ def get_navigation():
   nav = {}
 
   for page_url in page_urls:
-    if DEBUG:
-      print('/'+page_url)
-      print(str(models.Page.filter('/'+page_url)))
     if '/' in page_url:
       # TODO: definir una manera de ordernar categories/pagines
       # [
@@ -99,6 +122,48 @@ def get_navigation():
       nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title() }
 
   return nav
+
+#
+# ROUTES
+#
+
+@app.route('/search/', defaults={'page': 0})
+@app.route('/search/page/<int:page>')
+@cache.cached(timeout=86400)
+def search(page):
+  if DEBUG:
+    print('search')
+  try:
+    search_string = request.args.get('s').lower()
+  except:
+    search_string = ""
+
+  page_metadata={}
+  page_metadata['title']=['From pet to cattle']
+  page_metadata['robots']='noindex,follow'
+  page_metadata['keywords']=[' '.join(search_string)]
+  page_metadata['summary']=['Treat your clusters like cattle, not pets by using kubernetes, helm and terraform']
+
+  response = models.Post.search(search_string, fulltext_index, page, 5)
+
+  if len(response['Posts'])==0:
+    if DEBUG:
+      print('empty')
+    abort(404)
+
+  return render_template('index.html', 
+                    single=False,
+                    posts=response['Posts'], 
+                    post_metadata=page_metadata, 
+                    page_url='https://pet2cattle.com',
+                    pagination_prefix='/search/',
+                    page_number=page,
+                    has_next=response['next'],
+                    has_previous=page>0,
+                    navigation=get_navigation(),
+                    tag_cloud=get_tag_cloud(),
+                    search_enabled=search_enabled
+                  )
 
 @app.route('/static/<file_category>/<filename>')
 @cache.cached(timeout=86400)
@@ -220,7 +285,8 @@ def tags(tag, page):
                         has_next=tags[tag][(page+1)*10:(page+1)*10+10],
                         has_previous=page>0,
                         navigation=get_navigation(),
-                        tag_cloud=None
+                        tag_cloud=None,
+                        search_enabled=search_enabled
                       )
     else:
       abort(404)
@@ -311,7 +377,8 @@ def categories(category, page):
                         other_related_posts=other_related_categories,
                         navigation=get_navigation(),
                         tag_cloud=None,
-                        cat2tag=cat2tag[category]
+                        cat2tag=cat2tag[category],
+                        search_enabled=search_enabled
                       )
     else:
       abort(404)
@@ -359,7 +426,8 @@ def archives(year, month, page):
                     has_next=response['next'],
                     has_previous=page>0,
                     navigation=get_navigation(),
-                    tag_cloud=None
+                    tag_cloud=None,
+                    search_enabled=search_enabled
                   )
 
 @app.route('/<int:year>/<month>/<slug>')
@@ -378,7 +446,8 @@ def post(year, month, slug):
                         keywords=post.get_keywords(),
                         categories=post.get_categories(),
                         tags=post.get_tags(),
-                        navigation=get_navigation()
+                        navigation=get_navigation(),
+                        search_enabled=search_enabled
                   )
   except:
     pass
@@ -424,6 +493,7 @@ def index(page):
                     has_previous=page>0,
                     navigation=get_navigation(),
                     tag_cloud=get_tag_cloud(),
+                    search_enabled=search_enabled
                   )
 
 @app.route('/<path:path>')
@@ -447,7 +517,8 @@ def catch_all(path):
                         post_metadata=page.metadata, 
                         page_url=page.url, 
                         keywords=page.get_keywords(),
-                        navigation=get_navigation()
+                        navigation=get_navigation(),
+                        search_enabled=search_enabled
                   )
     else:
       if DEBUG:
