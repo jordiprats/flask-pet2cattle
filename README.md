@@ -20,3 +20,7 @@ MINIO_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE" MINIO_SECRET_KEY="wJalrXUtnFEMI/K7MDENG/
 ```
 FORCE_PUBLISH=1 DEBUG=1 flask run -p 8000 -h 0.0.0.0
 ```
+
+## TODO:
+
+* fix search pagination
