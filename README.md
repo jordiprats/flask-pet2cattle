@@ -24,3 +24,4 @@ FORCE_PUBLISH=1 DEBUG=1 flask run -p 8000 -h 0.0.0.0
 ## TODO:
 
 * fix search pagination
+* suggest alternate terms to search (or at least true random posts)
