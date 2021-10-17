@@ -7,6 +7,7 @@ import time
 
 while True:
   posts = app.models.Post.all(page=0, limit=-1)['Posts']
+  posts.reverse()
 
   for post in posts:
     print("==="+post.url)
