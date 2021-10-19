@@ -41,3 +41,20 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask-pet2cattle:${{ steps.vars.outputs.tag }}
+
+      - name: Checkout helm chart
+        uses: actions/checkout@v2
+        with:
+          repository: jordiprats/helm-pet2cattle
+          token: ${{ secrets.ACTIONS_TOKEN }}
+          path: ./helm-pet2cattle
+
+      - name: Update chart.yaml
+        run: |
+          sed 's/appVersion: "[^"]*"/appVersion: "${{ steps.vars.outputs.tag }}" -i ./helm-pet2cattle/Chart.yaml
+
+      - name: Push helm changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          cwd: ./helm-pet2cattle
+          message: 'update app version'
