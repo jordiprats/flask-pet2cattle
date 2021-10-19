@@ -51,7 +51,7 @@ jobs:
 
       - name: Update chart.yaml
         run: |
-          sed 's/appVersion: "[^"]*"/appVersion: "${{ steps.vars.outputs.tag }}" -i ./helm-pet2cattle/Chart.yaml
+          sed 's/appVersion: "[^"]*"/appVersion: "${{ steps.vars.outputs.tag }}"/' -i ./helm-pet2cattle/Chart.yaml
 
       - name: Push helm changes
         uses: EndBug/add-and-commit@v7
