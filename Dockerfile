@@ -24,6 +24,8 @@ COPY app /code/app
 
 RUN echo "0 0 * * * python /code/indexer.py" | crontab -u root -
 
+# TODO: posar el indexer i el cacherefresher com a serveis en un sol contenidor
+
 EXPOSE 8000
 
 CMD [ "/usr/local/bin/gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--keep-alive", "1" ]

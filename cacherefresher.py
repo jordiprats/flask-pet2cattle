@@ -6,12 +6,19 @@ import time
 # Posts
 
 while True:
-  posts = app.models.Post.all(page=0, limit=-1)['Posts']
-  posts.reverse()
+  try:
+    posts = app.models.Post.all(page=0, limit=-1)['Posts']
+    posts.reverse()
 
-  for post in posts:
-    print("==="+post.url)
-    requests.get("https://pet2cattle.com"+post.url)
-    time.sleep(30)
-  
-  time.sleep(600)
+    for post in posts:
+      print("==="+post.url)
+      try:
+        requests.get("https://pet2cattle.com"+post.url)
+      except Exception as e:
+        print(str(e))
+      time.sleep(30)
+    
+    time.sleep(600)
+  except Exception as e:
+    print(str(e))
+    time.sleep(60)
