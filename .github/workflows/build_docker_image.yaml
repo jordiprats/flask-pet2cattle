@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: jordiprats/helm-pet2cattle
-          token: ${{ secrets.ACTIONS_TOKEN }}
+          #token: ${{ secrets.ACTIONS_TOKEN }}
           path: ./helm-pet2cattle
 
       - name: Update chart.yaml
