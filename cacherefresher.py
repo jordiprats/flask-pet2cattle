@@ -13,7 +13,7 @@ while True:
     for post in posts:
       print("==="+post.url)
       try:
-        requests.get("https://pet2cattle.com"+post.url)
+        requests.get("http://localhost:8000"+post.url)
       except Exception as e:
         print(str(e))
       time.sleep(15)
