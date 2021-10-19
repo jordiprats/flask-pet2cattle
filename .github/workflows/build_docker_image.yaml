@@ -58,3 +58,4 @@ jobs:
         with:
           cwd: ./helm-pet2cattle
           message: 'update app version'
+          branch: master
