@@ -16,7 +16,7 @@ while True:
         requests.get("https://pet2cattle.com"+post.url)
       except Exception as e:
         print(str(e))
-      time.sleep(30)
+      time.sleep(15)
     
     time.sleep(600)
   except Exception as e:
