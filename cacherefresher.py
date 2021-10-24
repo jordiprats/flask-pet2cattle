@@ -9,6 +9,17 @@ import os
 
 ENDPOINT = os.getenv('ENDPOINT', 'http://127.0.0.1:8000')
 
+def wait_endpoint():
+
+  while True:
+    try:
+      response = requests.get(ENDPOINT+'/')
+      response.raise_for_status()
+      break
+    except:
+      pass
+    time.sleep(5)
+
 def is_valid(url):
   parsed = urlparse(url)
   return bool(parsed.netloc) and bool(parsed.scheme)
@@ -39,6 +50,8 @@ def get_all_website_links(url):
 # Posts
 
 while True:
+  wait_endpoint()
+
   try:
     # fetch homepage tags
     for url in get_all_website_links(ENDPOINT+'/'):
