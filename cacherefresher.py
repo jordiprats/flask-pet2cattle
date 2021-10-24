@@ -5,6 +5,9 @@ import app.models
 
 import requests
 import time
+import os
+
+ENDPOINT = os.getenv('EDNPOINT', 'http://127.0.0.1:8000'):
 
 def is_valid(url):
   parsed = urlparse(url)
@@ -38,7 +41,7 @@ def get_all_website_links(url):
 while True:
   try:
     # fetch homepage tags
-    for url in get_all_website_links('http://127.0.0.1:8000/'):
+    for url in get_all_website_links(ENDPOINT+'/'):
       print("==="+url)
       try:
         requests.get(url)
@@ -53,7 +56,7 @@ while True:
     for post in posts:
       print("==="+post.url)
       try:
-        requests.get("http://localhost:8000"+post.url)
+        requests.get(ENDPOINT+post.url)
       except Exception as e:
         print(str(e))
       time.sleep(15)
