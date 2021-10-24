@@ -28,7 +28,6 @@ RUN pip install -r requirements.txt
 
 COPY sitemapgen.py .
 COPY indexer.py .
-COPY cachewarmer.py .
 COPY cacherefresher.py .
 COPY sync.sh .
 COPY app /code/app
