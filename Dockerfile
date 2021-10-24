@@ -2,7 +2,7 @@ FROM rclone/rclone AS rclone
 
 FROM python:3.8-alpine
 
-RUN apk --no-cache add ca-certificates fuse tzdata git openssh && \
+RUN apk --no-cache add ca-certificates fuse tzdata git openssh supervisor && \
     echo "user_allow_other" >> /etc/fuse.conf
 
 COPY --from=rclone /usr/local/bin/rclone /usr/local/bin/
@@ -11,6 +11,17 @@ WORKDIR /code
 
 # GUNICORN - not an actual dependency
 RUN pip install gunicorn
+
+# supervisor config
+
+COPY supervisor/supervisord.conf /etc/supervisord.conf
+RUN mkdir -p /etc/supervisor.d/
+
+COPY supervisor/crond.ini /etc/supervisord.d/
+COPY supervisor/cacherefresher.ini /etc/supervisord.d/
+
+
+# app install
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
