@@ -17,8 +17,8 @@ RUN pip install gunicorn
 COPY supervisor/supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /etc/supervisor.d/
 
-COPY supervisor/crond.ini /etc/supervisord.d/
-COPY supervisor/cacherefresher.ini /etc/supervisord.d/
+COPY supervisor/crond.ini /etc/supervisor.d/
+COPY supervisor/cacherefresher.ini /etc/supervisor.d/
 
 
 # app install
