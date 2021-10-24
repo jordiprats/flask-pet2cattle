@@ -7,7 +7,7 @@ import requests
 import time
 import os
 
-ENDPOINT = os.getenv('EDNPOINT', 'http://127.0.0.1:8000'):
+ENDPOINT = os.getenv('ENDPOINT', 'http://127.0.0.1:8000'):
 
 def is_valid(url):
   parsed = urlparse(url)
