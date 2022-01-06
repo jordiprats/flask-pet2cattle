@@ -6,6 +6,11 @@ app = Flask(__name__)
 
 REDIRECT = os.getenv('REDIRECT', None)
 
+@app.route('/liveness')
+def liveness():
+    content = {'status': 'alive'}
+    return jsonify(content), 200
+
 @app.route('/', defaults={'u_path': ''})
 @app.route('/<path:u_path>')
 def catch_all(u_path):
