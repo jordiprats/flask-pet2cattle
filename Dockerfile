@@ -31,10 +31,11 @@ COPY indexer.py .
 COPY cacherefresher.py .
 COPY sync.sh .
 COPY app /code/app
+COPY redirector /code/redirector
 
 RUN echo "0 0 * * * python /code/indexer.py" | crontab -u root -
 
-# TODO: posar el indexer i el cacherefresher com a serveis en un sol contenidor
+# posar el indexer i el cacherefresher com a serveis en un sol contenidor ?
 
 EXPOSE 8000
 
