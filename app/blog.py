@@ -41,6 +41,8 @@ if DEBUG:
 else:
   CACHE_TYPE = "filesystem"
 
+CANONICAL_DOMAIN = os.getenv('CANONICAL_DOMAIN', 'https://pet2cattle.com')
+
 config = {
   "DEBUG": DEBUG,
   "CACHE_TYPE": CACHE_TYPE,
@@ -448,7 +450,8 @@ def post(year, month, slug):
                         single=True, 
                         post_html=post.html, 
                         post_metadata=post.metadata, 
-                        page_url=post.url, 
+                        page_url=post.url,
+                        canonical_url=CANONICAL_DOMAIN+post.url,
                         keywords=post.get_keywords(),
                         categories=post.get_categories(),
                         tags=post.get_tags(),
@@ -521,7 +524,8 @@ def catch_all(path):
                         single=True, 
                         post_html=page.html, 
                         post_metadata=page.metadata, 
-                        page_url=page.url, 
+                        page_url=page.url,
+                        canonical_url=CANONICAL_DOMAIN+page.url,
                         keywords=page.get_keywords(),
                         navigation=get_navigation(),
                         search_enabled=search_enabled
