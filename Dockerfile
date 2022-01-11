@@ -9,6 +9,9 @@ COPY --from=rclone /usr/local/bin/rclone /usr/local/bin/
 
 WORKDIR /code
 
+# update pip
+RUN python -m pip install --upgrade pip
+
 # GUNICORN - not an actual dependency
 RUN pip install gunicorn
 

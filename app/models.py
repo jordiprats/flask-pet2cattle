@@ -181,7 +181,7 @@ class Page(S3File):
       self.refresh_markdown()
 
   def refresh_markdown(self):
-    md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta', 'markdown.extensions.toc'])
+    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta', 'toc'])
     self.read_time = (len(self.raw_md.split())//200)+1
 
     self.html = md.convert(self.raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
@@ -199,7 +199,8 @@ class Page(S3File):
       if not self.metadata['image']:
         raise Exception("image empty")
     except:
-      print(str(self.metadata))
+      if DEBUG:
+        print(str(self.metadata))
       try:
         # TODO: check other default paths?
         for category in self.metadata['categories']:
@@ -302,7 +303,7 @@ class Page(S3File):
         break
       excerpt += line
 
-    md = markdown.Markdown(tab_length=2, extensions=['markdown.extensions.codehilite', 'markdown.extensions.fenced_code', 'markdown.extensions.meta'])
+    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta'])
 
     excerpt_html = md.convert(excerpt)
 
@@ -406,7 +407,6 @@ class Post(Page):
     
     with fulltext_index.searcher() as s:
         results = s.search_page(q, page+1, pagelen=limit)
-        print("Search Results: ")
         if results:
           if len(results)==limit:
             try:
