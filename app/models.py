@@ -432,14 +432,19 @@ class Post(Page):
     data = {}
     data['next'] = False
 
-    # TODO: arreglar limit de 1000 objectes
-    response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=s3_prefix, MaxKeys=1000)
+    paginator = s3_client.get_paginator('list_objects_v2')
+    page_iterator = paginator.paginate(Bucket=MINIO_BUCKET, Prefix=s3_prefix)
+
+    all_pages_response = []
+    for each_page in page_iterator:
+      for item in each_page['Contents']:    
+        all_pages_response.append(item)
+    
+    all_pages_response.sort(key=lambda x: x['Key'], reverse=True)
 
     posts = []
-    count=0
-    get_key_value = lambda obj: obj['Key']
-    for bucket_object in sorted(response['Contents'], key=get_key_value, reverse=True):
-
+    count=0    
+    for bucket_object in all_pages_response:
       base_url = re.match(r'^'+Post.bucket_prefix+r'(/[0-9]+/[0-9]+/).*\.md', bucket_object['Key'])
       if not base_url:
         continue
