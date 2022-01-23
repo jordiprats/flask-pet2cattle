@@ -1,6 +1,6 @@
 # flask-pet2cattle
 
-Blogging platform with **Flask** using object storage (**S3**/**MinIO**) as backend running on **Kubernetes** (deployed using a [helm chart](https://github.com/jordiprats/helm-pet2cattle))
+Blogging platform built using **Flask** and object storage (**S3**/**MinIO**) as backend running on **Kubernetes** (deployed using a [helm chart](https://github.com/jordiprats/helm-pet2cattle))
 
 ![pet2cattle diagram](diagrams/pet2cattle.png "pet2cattle diagram")
 
