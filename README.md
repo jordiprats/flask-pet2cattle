@@ -1,5 +1,9 @@
 # flask-pet2cattle
 
+Blogging platform with **Flask** using object storage (**S3**/**MinIO**) as backend
+
+![pet2cattle diagram](diagrams/pet2cattle.png "pet2cattle diagram")
+
 ## development minio
 
 ```
