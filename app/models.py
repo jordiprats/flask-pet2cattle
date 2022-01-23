@@ -215,7 +215,7 @@ class Page(S3File):
 
   def is_menu(self):
     try:
-      if self.metadata['Menu'][0]=='false':
+      if self.metadata['menu'][0]=='false':
         return False
       else:
         return True
