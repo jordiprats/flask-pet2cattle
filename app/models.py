@@ -361,7 +361,7 @@ class Page(S3File):
     global MINIO_BUCKET, s3_client, DEBUG
     init_s3_client()
 
-    # no hi hauria d'haver més de 1000 pàgines (ni 50 de fet)
+    # el limit de 1000 pàgines no hauria de ser un problema
     response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=Page.bucket_prefix, MaxKeys=1000)
 
     pages = []
