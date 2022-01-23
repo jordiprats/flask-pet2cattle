@@ -213,6 +213,15 @@ class Page(S3File):
   def is_page(self):
       return True
 
+  def is_menu(self):
+    try:
+      if self.metadata['Menu'][0]=='false':
+        return False
+      else:
+        return True
+    except:
+      return True
+
   def is_published(self):
     if FORCE_PUBLISH:
       return True
@@ -381,7 +390,7 @@ class Page(S3File):
       page_response = s3_client.get_object(Bucket=MINIO_BUCKET, Key=bucket_object['Key'])
       page = Page(url, page_response['Body'].read().decode('utf-8'), page_response['LastModified'])
 
-      if page.is_published():
+      if page.is_published() and page.is_menu():
         pages.append(url)
 
     return pages
