@@ -196,6 +196,12 @@ class Page(S3File):
     self.refresh_markdown()
 
     try:
+      if isinstance(self.metadata['robots'][0], str):
+        self.metadata['robots'] = self.metadata['robots'][0]
+    except:
+      pass
+
+    try:
       if not self.metadata['image']:
         raise Exception("image empty")
     except:

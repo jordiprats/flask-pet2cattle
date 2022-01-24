@@ -121,7 +121,14 @@ def get_navigation():
 
       nav[category]['subpages'].append({ 'is_page': True, 'url': '/'+category+'/'+page, 'title': models.Page.filter('/'+page_url)[0].get_short_title() })
     else:
-      nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title() }
+      rel=""
+      try:
+        page = models.Page.filter(page_url)[0]
+        if "nofollow" in page.metadata['robots']:
+          rel="nofollow"
+      except:
+        pass
+      nav[page_url] = { 'is_page': True, 'url': '/'+page_url, 'title': models.Page.filter('/'+page_url)[0].get_title(), 'rel': rel }
 
   return nav
 

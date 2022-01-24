@@ -61,14 +61,22 @@
           {% for title, item in navigation.items() %}
             {% if item['is_page'] %}
               <li class="nav-item active">
+                {% if item['rel'] %}
+                <a rel="{{ item['rel'] }}" class="nav-link" href="{{ item['url'] }}">{{ title }}</a>
+                {% else %}
                 <a class="nav-link" href="{{ item['url'] }}">{{ title }}</a>
+                {% endif %}
               </li>
             {% else %}
             <li class="nav-item dropdown active">
               <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ title }}</a>
               <div class="dropdown-menu">
               {% for page in item['subpages'] %}
+                {% if page['rel'] %}
+                <a rel="{{ page['rel'] }}" class="dropdown-item" href="{{ page['url'] }}">{{ page['title'] }}</a>
+                {% else %}
                 <a class="dropdown-item" href="{{ page['url'] }}">{{ page['title'] }}</a>
+                {% endif %}
               {% endfor %}
             </div>
             </li>
