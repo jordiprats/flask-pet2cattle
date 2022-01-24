@@ -124,7 +124,7 @@ def get_navigation():
       rel=""
       try:
         page = models.Page.filter(page_url)[0]
-        if "nofollow" in page.metadata['robots']:
+        if "noindex" in page.metadata['robots']:
           rel="nofollow"
       except:
         pass
