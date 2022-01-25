@@ -356,6 +356,9 @@ class Page(S3File):
     global MINIO_BUCKET, s3_client
     init_s3_client()
 
+    if url[0]!='/':
+      url='/'+url
+
     response = s3_client.list_objects_v2(Bucket=MINIO_BUCKET, Prefix=Page.bucket_prefix+'/', MaxKeys=1000)
 
     if not 'Contents' in response.keys():
