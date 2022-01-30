@@ -74,11 +74,11 @@ with gzip.open(filename=tmp_sitemap_posts, mode='wb') as sitemap_posts:
         sitemap_posts.write(bytes('\t\t<lastmod>'+post.get_last_modified().strftime("%Y-%m-%d")+'</lastmod>\n', 'utf-8'))
         # TODO: calcula si es gaire antic
         marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=3)
+        # no es gaire reliable
         if post.get_last_modified() < marge_dies:
             sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
         else:
-            # de moment sempre monthly pq get_last_modified no es reliable
-            sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
+            sitemap_posts.write(bytes('\t\t<changefreq>daily</changefreq>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<priority>0.5</priority>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t</url>\n', 'utf-8'))
     sitemap_posts.write(bytes('</urlset>', 'utf-8'))
