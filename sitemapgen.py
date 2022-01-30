@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 import app.models
@@ -32,7 +33,7 @@ rss_posts.write(bytes('<channel>\n', 'utf-8'))
 rss_posts.write(bytes('<title>From pet to cattle</title>\n', 'utf-8'))
 rss_posts.write(bytes('<atom:link href="https://pet2cattle.com/sitemap.rss" rel="self" type="application/rss+xml" />\n', 'utf-8'))
 rss_posts.write(bytes('<link>https://pet2cattle.com</link>\n', 'utf-8'))
-rss_posts.write(bytes('<description>Tu referencia para la administración de sistemas</description>\n', 'utf-8'))
+rss_posts.write(bytes('<description>Treat your clusters like cattle, not pets by using kubernetes, helm and terraform</description>\n', 'utf-8'))
 rss_posts.write(bytes('<lastBuildDate>'+date2rss(datetime.now().replace(tzinfo=pytz.UTC))+'</lastBuildDate>\n', 'utf-8'))
 rss_posts.write(bytes('<language>en-US</language>\n', 'utf-8'))
 rss_posts.write(bytes('<sy:updatePeriod>daily</sy:updatePeriod>\n', 'utf-8'))
@@ -71,7 +72,13 @@ with gzip.open(filename=tmp_sitemap_posts, mode='wb') as sitemap_posts:
         sitemap_posts.write(bytes('\t<url>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<loc>https://pet2cattle.com'+post.url+'</loc>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<lastmod>'+post.get_last_modified().strftime("%Y-%m-%d")+'</lastmod>\n', 'utf-8'))
-        sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
+        # TODO: calcula si es gaire antic
+        marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=3)
+        if post.get_last_modified() < marge_dies:
+            sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
+        else:
+            # de moment sempre monthly pq get_last_modified no es reliable
+            sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<priority>0.5</priority>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t</url>\n', 'utf-8'))
     sitemap_posts.write(bytes('</urlset>', 'utf-8'))
