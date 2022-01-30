@@ -8,6 +8,7 @@ from whoosh import index
 import app.models
 
 import tempfile
+import datetime
 import random
 import pickle
 import sys
@@ -24,10 +25,13 @@ def getFTschema():
               )
 
 if __name__ == "__main__":
+
+  posts = app.models.Post.all(page=0, limit=-1)['Posts']
+
   try:
     categories = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for category in post.get_categories():
         if slugify(category) in categories.keys():
           categories[slugify(category)].append(post.url)
@@ -49,7 +53,7 @@ if __name__ == "__main__":
   try:
     tags = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for tag in post.get_tags():
         if slugify(tag) in tags.keys():
           tags[slugify(tag)].append(post.url)
@@ -72,11 +76,11 @@ if __name__ == "__main__":
     ordered_tag_cloud = {}
     tag_cloud = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for tag in post.get_tags():
         ordered_tag_cloud[tag] = { 'count': len(tags[slugify(tag)]), 'url': '/tags/'+slugify(tag)}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for category in post.get_categories():
         ordered_tag_cloud[category] = { 'count': len(categories[slugify(category)]), 'url': '/categories/'+slugify(category)}
 
@@ -122,7 +126,7 @@ if __name__ == "__main__":
   try:
     cat2tag = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for category in post.get_categories():
         if slugify(category) in cat2tag.keys():
           tags = cat2tag[slugify(category)]
@@ -171,7 +175,7 @@ if __name__ == "__main__":
   try:
     cat2relatedcats = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for category in post.get_categories():
         if slugify(category) not in cat2relatedcats.keys():
           cat2relatedcats[slugify(category)] = {}
@@ -202,7 +206,7 @@ if __name__ == "__main__":
   try:
     autopage = {}
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       for autopage_instance in post.get_autopages():     
         if autopage_instance not in autopage.keys():
           autopage[autopage_instance] = {}
@@ -229,7 +233,7 @@ if __name__ == "__main__":
 
         autopage[autopage_instance][autopage_category].append(autopage_post)
 
-    print(str(autopage))
+    # print(str(autopage))
 
     tmp_autopage = tempfile.TemporaryFile()
 
@@ -266,7 +270,7 @@ if __name__ == "__main__":
 
     idx_writer = idx.writer()
 
-    for post in app.models.Post.all(page=0, limit=-1)['Posts']:
+    for post in posts:
       keywords = " ".join(post.get_categories())+' '+" ".join(post.get_keywords())+' '+" ".join(post.get_tags())
       # print(keywords)
       idx_writer.update_document(
@@ -283,7 +287,41 @@ if __name__ == "__main__":
     print("full text search index (whoosh) OK")
 
   except Exception as e:
-    print("Error generant ull text search index: "+str(e))
+    print("Error generant full text search index: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+
+  #
+  # archives
+  #
+
+  try:
+    archives = {}
+    
+    for post in posts:
+      url = post.get_url()
+      url_components = url.split('/')
+
+      title = datetime.date(1900, int(url_components[2]), 1).strftime('%B')+" "+url_components[1]
+
+      if title not in archives.keys():
+        archives[title]="/".join(url_components[0:3])
+
+    # print(str(archives))
+
+    tmp_archives = tempfile.TemporaryFile()
+
+    pickle.dump(archives, tmp_archives)
+    tmp_archives.seek(os.SEEK_SET)
+
+    archives_dict = app.models.S3File('indexes', 'archives.dict')
+    archives_dict.save(tmp_archives)
+
+    print("archives.dict OK")
+
+  except Exception as e:
+    print("Error generant archive liust: "+str(e))
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)

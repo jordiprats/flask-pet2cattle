@@ -12,15 +12,12 @@ from flask import abort
 from whoosh.filedb.filestore import FileStorage
 from whoosh import index
 
-from datetime import datetime
 from slugify import slugify
 
 from app import models
 from app import app
 
-import indexer
-
-import markdown
+import datetime
 import pickle
 import yaml
 import re
@@ -79,6 +76,13 @@ except Exception as e:
 
 if DEBUG:
   print('search_enabled: '+str(search_enabled))
+
+@cache.cached(timeout=86400, key_prefix="get_archives")
+def get_archives():
+  try:
+    return pickle.loads(models.S3File('indexes', 'archives.dict').get_data().read())
+  except:
+    return {}
 
 
 @cache.cached(timeout=7200, key_prefix="get_related_categories")
@@ -408,15 +412,22 @@ def categories(category, page):
 @cache.cached(timeout=86400)
 def archives(year, month, page):
   if DEBUG:
-    print('archives')
+    print('RESPONSE archives')
   page_metadata={}
   page_metadata['robots']='noindex,follow'
-  page_metadata['title']=['Archives: From pet to cattle']
+  
   page_metadata['keywords']=['terraform, kubernetes, helm, pet vs cattle']
   if month:
-    page_metadata['summary']=['Archived posts from '+month+'/'+str(year)]
+    try:
+      month_name = datetime.date(1900, int(month), 1).strftime('%B')
+      page_metadata['title']=['Archives '+month_name+' '+str(year)]
+      page_metadata['summary']=['List of posts published on '+month_name+' '+str(year)]
+    except Exception as e:
+      print(str(e))
+      abort(404)
   else:
-    page_metadata['summary']=['Archived posts from '+str(year)]
+    page_metadata['title']=['Archives for year: '+str(year)]
+    page_metadata['summary']=['List of posts published on year '+str(year)]
 
   if month:
     limit = 10
@@ -483,7 +494,7 @@ def get_tag_cloud():
 @cache.cached(timeout=7200)
 def index(page):
   if DEBUG:
-    print('index')
+    print('RESPONSE index')
   page_metadata={}
   page_metadata['title']=['From pet to cattle']
   if page!=0:
@@ -498,8 +509,11 @@ def index(page):
       print('empty')
     abort(404)
 
+  # print("ARCHIVES: "+str(get_archives()))
+
   return render_template('index.html', 
                     single=False,
+                    archives=get_archives(),
                     posts=response['Posts'], 
                     post_metadata=page_metadata, 
                     page_url='https://pet2cattle.com',
@@ -516,7 +530,7 @@ def index(page):
 @cache.cached(timeout=86400)
 def catch_all(path):
   if DEBUG:
-    print(str(get_navigation()))
+    print("RESPONSE catchall")
   try:
     if DEBUG:
       print('/'+path)
