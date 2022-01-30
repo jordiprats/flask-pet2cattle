@@ -73,7 +73,7 @@ with gzip.open(filename=tmp_sitemap_posts, mode='wb') as sitemap_posts:
         sitemap_posts.write(bytes('\t\t<loc>https://pet2cattle.com'+post.url+'</loc>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<lastmod>'+post.get_last_modified().strftime("%Y-%m-%d")+'</lastmod>\n', 'utf-8'))
         # TODO: calcula si es gaire antic
-        marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=3)
+        marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=1)
         # no es gaire reliable
         if post.get_last_modified() < marge_dies:
             sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
