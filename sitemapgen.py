@@ -81,7 +81,7 @@ with gzip.open(filename=tmp_sitemap_posts, mode='wb') as sitemap_posts:
             sitemap_posts.write(bytes('\t\t<changefreq>daily</changefreq>\n', 'utf-8'))
         # si s'ha actualitzat en la última setmana, mes prioritat
         marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(days=7)
-        if post.get_last_modified() < marge_canvis:
+        if post.get_last_modified() < marge_dies:
             sitemap_posts.write(bytes('\t\t<priority>0.5</priority>\n', 'utf-8'))
         else:
             sitemap_posts.write(bytes('\t\t<priority>0.7</priority>\n', 'utf-8'))
