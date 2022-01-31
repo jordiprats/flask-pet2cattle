@@ -72,14 +72,19 @@ with gzip.open(filename=tmp_sitemap_posts, mode='wb') as sitemap_posts:
         sitemap_posts.write(bytes('\t<url>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<loc>https://pet2cattle.com'+post.url+'</loc>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t\t<lastmod>'+post.get_last_modified().strftime("%Y-%m-%d")+'</lastmod>\n', 'utf-8'))
-        # TODO: calcula si es gaire antic
-        marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=1)
+        # calcula si es gaire antic per definit la freqüencia de canvis
+        marge_canvis = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(months=1)
         # no es gaire reliable
-        if post.get_last_modified() < marge_dies:
+        if post.get_last_modified() < marge_canvis:
             sitemap_posts.write(bytes('\t\t<changefreq>monthly</changefreq>\n', 'utf-8'))
         else:
             sitemap_posts.write(bytes('\t\t<changefreq>daily</changefreq>\n', 'utf-8'))
-        sitemap_posts.write(bytes('\t\t<priority>0.5</priority>\n', 'utf-8'))
+        # si s'ha actualitzat en la última setmana, mes prioritat
+        marge_dies = datetime.now().replace(tzinfo=pytz.UTC) - relativedelta(days=7)
+        if post.get_last_modified() < marge_canvis:
+            sitemap_posts.write(bytes('\t\t<priority>0.5</priority>\n', 'utf-8'))
+        else:
+            sitemap_posts.write(bytes('\t\t<priority>0.7</priority>\n', 'utf-8'))
         sitemap_posts.write(bytes('\t</url>\n', 'utf-8'))
     sitemap_posts.write(bytes('</urlset>', 'utf-8'))
 
