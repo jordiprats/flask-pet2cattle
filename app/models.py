@@ -137,7 +137,7 @@ class Page(S3File):
     return self.read_time
 
   def autopage(self):
-    autopage_matcher = re.compile('\[autopage:([a-z]+)\]')
+    autopage_matcher = re.compile('\[autopage:([a-z0-9]+)\]')
     matchs = autopage_matcher.search(self.raw_md)
 
     if matchs:
@@ -170,10 +170,10 @@ class Page(S3File):
 
         if DEBUG:
           print('AUTOPAGE: '+md_autopage)
-        self.raw_md = re.sub('\[autopage:([a-z]+)\]', md_autopage, self.raw_md)
+        self.raw_md = re.sub('\[autopage:([a-z0-9]+)\]', md_autopage, self.raw_md)
 
       except Exception as e:
-        self.raw_md = re.sub('\[autopage:([a-z]+)\]', '', self.raw_md)
+        self.raw_md = re.sub('\[autopage:([a-z0-9]+)\]', '', self.raw_md)
         if DEBUG:
           print(str(e))
         pass
