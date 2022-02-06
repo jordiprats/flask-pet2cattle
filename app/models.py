@@ -181,7 +181,7 @@ class Page(S3File):
       self.refresh_markdown()
 
   def refresh_markdown(self):
-    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta', 'toc'])
+    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta', 'toc', 'attr_list'])
     self.read_time = (len(self.raw_md.split())//200)+1
 
     self.html = md.convert(self.raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
@@ -318,7 +318,7 @@ class Page(S3File):
         break
       excerpt += line
 
-    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta'])
+    md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta', 'attr_list'])
 
     excerpt_html = md.convert(excerpt)
 
