@@ -202,7 +202,12 @@ class Page(S3File):
       pass
 
     try:
-      if not self.metadata['image']:
+      if isinstance(self.metadata['image'][0], str):
+        if self.metadata['image'][0].startswith('http'):
+          self.metadata['image'] = self.metadata['image'][0]
+        else:
+          self.metadata['image'] = "https://static.pet2cattle.com"+self.metadata['image'][0]
+      else:
         raise Exception("image empty")
     except:
       if DEBUG:
