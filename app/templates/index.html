@@ -15,6 +15,10 @@
             <li style="margin-top: 30px;">
                 <h2><a style="color: black;" href="{{ post.url }}">{{ post.get_title() }}</a></h2>
                 <p class="text-secondary" >{{ post.get_read_time() }} min read</p>
+                {% if post.metadata['image'] %}
+                <center><img alt="{{ post.metadata['keywords'] }}" class="img-thumbnail" src="{{ post.metadata['image'] }}" title="{{ post.metadata['keywords'] }}" /></center>
+                <br>
+                {% endif %}
                 {{ post.get_excerpt() | safe }}
                 <p class="text-secondary float-right" >{{ post.get_print_date() }}</p>
                 <a href="{{ post.url }}">Read more...</a>
