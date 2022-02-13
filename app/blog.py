@@ -273,6 +273,11 @@ def tags(tag, page):
   if not tags:
     abort(404)
 
+  if page == 0:
+    tag_canonical_url = CANONICAL_DOMAIN+'/tags/'+tag+'/'
+  else:
+    tag_canonical_url = CANONICAL_DOMAIN+'/tags/'+tag+'/page/'+str(page)
+
   if tag:
     if tag in tags.keys():
       page_metadata={}
@@ -299,6 +304,7 @@ def tags(tag, page):
                         posts=posts, 
                         post_metadata=page_metadata, 
                         page_url='https://pet2cattle.com',
+                        canonical_url=tag_canonical_url,
                         pagination_prefix=prefix+'/',
                         page_number=page,
                         has_next=tags[tag][(page+1)*10:(page+1)*10+10],
@@ -351,6 +357,11 @@ def categories(category, page):
   if not categories:
     abort(404)
 
+  if page == 0:
+    category_canonical_url = CANONICAL_DOMAIN+'/categories/'+category+'/'
+  else:
+    category_canonical_url = CANONICAL_DOMAIN+'/categories/'+category+'/page/'+str(page)
+
   if category:
     if category in categories.keys():
       page_metadata={}
@@ -388,6 +399,7 @@ def categories(category, page):
                         posts=posts, 
                         post_metadata=page_metadata, 
                         page_url='https://pet2cattle.com',
+                        canonical_url=category_canonical_url,
                         pagination_prefix=prefix+'/',
                         page_number=page,
                         has_next=categories[category][(page+1)*10:(page+1)*10+10],
@@ -416,6 +428,12 @@ def archives(year, month, page):
   page_metadata={}
   page_metadata['robots']='noindex,follow'
   
+  archive_canonical_url = CANONICAL_DOMAIN+'/'+str(year)+'/'
+  if month:
+    archive_canonical_url += month+'/'
+  if page != 0:
+    archive_canonical_url += 'page/'+str(page)
+
   page_metadata['keywords']=['terraform, kubernetes, helm, pet vs cattle']
   if month:
     try:
@@ -447,6 +465,7 @@ def archives(year, month, page):
                     posts=response['Posts'], 
                     post_metadata=page_metadata, 
                     page_url='https://pet2cattle.com',
+                    canonical_url=archive_canonical_url,
                     pagination_prefix=prefix+'/',
                     page_number=page,
                     has_next=response['next'],
