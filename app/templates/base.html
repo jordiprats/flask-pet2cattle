@@ -24,6 +24,18 @@
   <meta name="Robots" content="index,follow" />
   {% endif %}
 
+  {% if categories %}
+  {% for category in categories %}
+  <meta property="article:section" content="{{ category }}"> 
+  {% endfor %}
+  {% endif %}
+
+  {% if tags %}
+  {% for tag in tags %}
+  <meta property="article:tag" content="{{ tag }}"> 
+  {% endfor %}
+  {% endif %}
+
 	<meta name="keywords" content="{{ post_metadata['keywords'][0] }}">  
 
   <link rel="alternate" type="application/rss+xml" title="RSS Feed for pet2cattle.com" href="https://pet2cattle.com/feed.rss" />
