@@ -184,7 +184,7 @@ class Page(S3File):
     md = markdown.Markdown(tab_length=2, extensions=['codehilite', 'fenced_code', 'meta', 'toc', 'attr_list'])
     self.read_time = (len(self.raw_md.split())//200)+1
 
-    self.html = md.convert(self.raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read</p>')
+    self.html = md.convert(self.raw_md).replace('</h1>','</h1><p class="text-secondary" >'+str(self.read_time)+' min read | by Jordi Prats</p>')
     
     self.metadata = md.Meta
 
