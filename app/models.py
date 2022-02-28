@@ -207,6 +207,10 @@ class Page(S3File):
           self.metadata['image'] = self.metadata['image'][0]
         else:
           self.metadata['image'] = "https://static.pet2cattle.com"+self.metadata['image'][0]
+          
+          img_post = '<center><img alt="'+' '.join(self.get_keywords())+'" class="img-thumbnail" src="'+self.metadata['image']+'" title="'+' '.join(self.get_keywords())+'" /></center>'
+          self.html = self.html.replace('</h1><p class="text-secondary" >','</h1>'+img_post+'<br><p class="text-secondary" >')
+
       else:
         raise Exception("image empty")
     except:
