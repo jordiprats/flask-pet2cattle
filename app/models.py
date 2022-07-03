@@ -19,6 +19,24 @@ MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'pet2cattle')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'AKIAIOSFODNN7EXAMPLE')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
 
+if os.getenv('S3_ENV_AUTH', False):
+  try:
+    int_value = int(os.getenv('S3_ENV_AUTH', False))
+    if int_value > 0:
+      S3_ENV_AUTH = True
+    else:
+      S3_ENV_AUTH = False
+  except:
+    try:
+      if os.getenv('S3_ENV_AUTH', "").lower() in ['true', 't', 'y', 'yes', 'yeah', 'yup']:
+        S3_ENV_AUTH = True
+      else:
+        S3_ENV_AUTH = False
+    except:
+      S3_ENV_AUTH = False
+else:
+  S3_ENV_AUTH = False
+
 if os.getenv('DEBUG', False):
   DEBUG=True
 else:
@@ -38,13 +56,22 @@ def init_s3_client():
     try:
       if DEBUG:
         print("connecting: "+MINIO_URL)
-      s3_client = boto3.client(
-                    service_name='s3',
-                    endpoint_url=MINIO_URL,
-                    aws_access_key_id=MINIO_ACCESS_KEY,
-                    aws_secret_access_key=MINIO_SECRET_KEY,
-                    config=Config(signature_version='s3v4'),
-                  )
+      if MINIO_URL:
+        s3_client = boto3.client(
+                      service_name='s3',
+                      endpoint_url=MINIO_URL,
+                      aws_access_key_id=MINIO_ACCESS_KEY,
+                      aws_secret_access_key=MINIO_SECRET_KEY,
+                      config=Config(signature_version='s3v4'),
+                    )
+      elif S3_ENV_AUTH:
+        s3_client = boto3.client(service_name='s3')
+      else:
+        s3_client = boto3.client(
+                      service_name='s3',
+                      aws_access_key_id=MINIO_ACCESS_KEY,
+                      aws_secret_access_key=MINIO_SECRET_KEY,
+                    )
     except:
       if DEBUG:
         print("ERROR: unable to connect to bucket")

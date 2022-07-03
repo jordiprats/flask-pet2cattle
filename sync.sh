@@ -17,10 +17,10 @@ if [ ! -f /root/.config/rclone/rclone.conf ];
 then
     mkdir -p /root/.config/rclone/
     cat <<EOF > /root/.config/rclone/rclone.conf
-[minio]
+[remote]
 type = s3
-provider = Minio
-env_auth = false
+provider = ${S3_PROVIDER-Minio}
+env_auth = ${S3_ENV_AUTH-false}
 access_key_id = $(cat /etc/minio/accesskey)
 secret_access_key = $(cat /etc/minio/secretkey)
 region = us-east-1
@@ -32,10 +32,10 @@ fi
 
 # check bucket
 
-rclone lsd minio: | grep "${MINIO_BUCKET}"
+rclone lsd remote: | grep "${MINIO_BUCKET}"
 if [ "$?" -ne 0 ];
 then
-    rclone mkdir "minio:${MINIO_BUCKET}"
+    rclone mkdir "remote:${MINIO_BUCKET}"
 fi
 
 PREV_HASH=""
@@ -52,11 +52,11 @@ do
 
     if [ "${CURRENT_HASH}" != "${PREV_HASH}"];
     then
-        rclone --no-update-modtime sync repo/favicon.ico "minio:${MINIO_BUCKET}"
-        rclone --no-update-modtime sync repo/posts       "minio:${MINIO_BUCKET}/posts"
-        rclone --no-update-modtime sync repo/pages       "minio:${MINIO_BUCKET}/pages"
-        rclone --no-update-modtime sync repo/static      "minio:${MINIO_BUCKET}/static"
-        rclone --no-update-modtime sync repo/redirects   "minio:${MINIO_BUCKET}/redirects"
+        rclone --no-update-modtime sync repo/favicon.ico "remote:${MINIO_BUCKET}"
+        rclone --no-update-modtime sync repo/posts       "remote:${MINIO_BUCKET}/posts"
+        rclone --no-update-modtime sync repo/pages       "remote:${MINIO_BUCKET}/pages"
+        rclone --no-update-modtime sync repo/static      "remote:${MINIO_BUCKET}/static"
+        rclone --no-update-modtime sync repo/redirects   "remote:${MINIO_BUCKET}/redirects"
 
         PREV_HASH="${CURRENT_HASH}"
     fi
