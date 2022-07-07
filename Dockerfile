@@ -43,9 +43,9 @@ RUN echo "0 0 * * * python /code/indexer.py" | crontab -u root -
 # user
 
 RUN addgroup -g 1000 pet2cattle
-RUN adduser -u 1000 -D pet2cattle
+RUN adduser -u 1000 -G pet2cattle -D -h /home/pet2cattle pet2cattle
 
-RUN mkdir /home/pet2cattle
+RUN mkdir -p /home/pet2cattle
 RUN chown -R 1000:1000 /home/pet2cattle
 
 ENV HOME /home/pet2cattle
