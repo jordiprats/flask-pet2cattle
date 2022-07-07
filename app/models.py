@@ -14,7 +14,7 @@ import os
 import io
 
 # global settings
-MINIO_URL        = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
+# MINIO_URL depends on S3_ENV_AUTH
 MINIO_BUCKET     = os.getenv('MINIO_BUCKET', 'pet2cattle')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'AKIAIOSFODNN7EXAMPLE')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
@@ -36,6 +36,9 @@ if os.getenv('S3_ENV_AUTH', False):
       S3_ENV_AUTH = False
 else:
   S3_ENV_AUTH = False
+
+if not S3_ENV_AUTH:
+  MINIO_URL        = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
 
 if os.getenv('DEBUG', False):
   DEBUG=True
