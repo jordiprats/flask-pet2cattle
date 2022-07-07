@@ -500,8 +500,11 @@ class Post(Page):
 
     all_pages_response = []
     for each_page in page_iterator:
-      for item in each_page['Contents']:    
-        all_pages_response.append(item)
+      if 'Contents' not in each_page.keys():
+        continue
+      else:
+        for item in each_page['Contents']:
+          all_pages_response.append(item)
     
     all_pages_response.sort(key=lambda x: x['Key'], reverse=True)
 
