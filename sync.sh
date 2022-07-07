@@ -5,18 +5,18 @@ then
     set -x
 fi
 
-mkdir -p /root/.ssh
-chmod 700 /root/.ssh
+mkdir -p ${HOME-/root}/.ssh
+chmod 700 ${HOME-/root}/.ssh
 
-for key in /root/deploykeys/*;
+for key in ${HOME-/root}/deploykeys/*;
 do
-    ln -s $key /root/.ssh >/dev/null 2>&1
+    ln -s $key ${HOME-/root}/.ssh >/dev/null 2>&1
 done
 
-if [ ! -f /root/.config/rclone/rclone.conf ];
+if [ ! -f ${HOME-/root}/.config/rclone/rclone.conf ];
 then
-    mkdir -p /root/.config/rclone/
-    cat <<EOF > /root/.config/rclone/rclone.conf
+    mkdir -p ${HOME-/root}/.config/rclone/
+    cat <<EOF > ${HOME-/root}/.config/rclone/rclone.conf
 [remote]
 type = s3
 provider = ${S3_PROVIDER-Minio}

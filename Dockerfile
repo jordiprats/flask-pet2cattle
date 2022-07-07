@@ -40,6 +40,20 @@ RUN echo "0 0 * * * python /code/indexer.py" | crontab -u root -
 
 # posar el indexer i el cacherefresher com a serveis en un sol contenidor ?
 
+# user
+
+RUN addgroup -g 1000 pet2cattle
+RUN adduser -u 1000 -D pet2cattle
+
+RUN mkdir /home/pet2cattle
+RUN chown -R 1000:1000 /home/pet2cattle
+
+ENV HOME /home/pet2cattle
+
+# runtime
+
+USER pet2cattle:pet2cattle
+
 EXPOSE 8000
 
 CMD [ "/usr/local/bin/gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--keep-alive", "1" ]
