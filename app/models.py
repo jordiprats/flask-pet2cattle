@@ -59,9 +59,9 @@ def init_s3_client():
 
   if not s3_client:
     try:
-      if DEBUG:
-        print("connecting: "+MINIO_URL)
       if MINIO_URL:
+        if DEBUG:
+          print("connecting: "+MINIO_URL)
         s3_client = boto3.client(
                       service_name='s3',
                       endpoint_url=MINIO_URL,
@@ -70,8 +70,12 @@ def init_s3_client():
                       config=Config(signature_version='s3v4'),
                     )
       elif S3_ENV_AUTH:
+        if DEBUG:
+          print("S3 access with instance profile")
         s3_client = boto3.client(service_name='s3')
       else:
+        if DEBUG:
+          print("S3 access with access tokens")
         s3_client = boto3.client(
                       service_name='s3',
                       aws_access_key_id=MINIO_ACCESS_KEY,
