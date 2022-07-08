@@ -8,7 +8,7 @@ fi
 mkdir -p ${HOME-/root}/.ssh
 chmod 700 ${HOME-/root}/.ssh
 
-for key in ${HOME-/root}/deploykeys/*;
+for key in /home/deploykeys/*;
 do
     ln -s $key ${HOME-/root}/.ssh >/dev/null 2>&1
 done
@@ -40,7 +40,8 @@ fi
 
 PREV_HASH=""
 
-mkdir tmp
+mkdir -p reposync_tmp
+cd reposync_tmp
 
 while true;
 do
