@@ -40,6 +40,8 @@ fi
 
 PREV_HASH=""
 
+mkdir tmp
+
 while true;
 do
     rm -fr repo
