@@ -5,13 +5,14 @@ then
     set -x
 fi
 
-mkdir -p ${HOME-/root}/.ssh
-chmod 700 ${HOME-/root}/.ssh
-
-for key in /home/deploykeys/*;
-do
-    ln -s $key ${HOME-/root}/.ssh >/dev/null 2>&1
-done
+if [ ! -f ${HOME-/root}/.ssh/config ];
+then
+    cat <<"EOF" >${HOME-/root}/.ssh/config
+Host *
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+EOF
+fi
 
 if [ ! -f ${HOME-/root}/.config/rclone/rclone.conf ];
 then

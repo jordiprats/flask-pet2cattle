@@ -44,7 +44,7 @@ config = {
   "DEBUG": DEBUG,
   "CACHE_TYPE": CACHE_TYPE,
   "CACHE_DEFAULT_TIMEOUT": 300,
-  'CACHE_DIR': 'cache'
+  'CACHE_DIR': os.getenv('CACHE_DIR', 'cache')
 }
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
