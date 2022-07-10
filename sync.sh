@@ -54,7 +54,7 @@ do
     CURRENT_HASH=$(git rev-parse HEAD)
     cd ..
 
-    if [ "${CURRENT_HASH}" != "${PREV_HASH}"];
+    if [[ "${CURRENT_HASH}" != "${PREV_HASH}"]];
     then
         rclone --no-update-modtime sync repo/favicon.ico "remote:${MINIO_BUCKET}"
         rclone --no-update-modtime sync repo/posts       "remote:${MINIO_BUCKET}/posts"
