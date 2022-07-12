@@ -233,7 +233,9 @@ def favicon():
     response = make_response(models.S3File('', 'favicon.ico').get_data().read(), 200)
     response.mimetype = "image/x-icon"
     return response
-  except:
+  except Exception as e:
+    if DEBUG:
+      print(str(e))
     abort(404)
 
 @app.route('/robots.txt')
