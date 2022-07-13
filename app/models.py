@@ -61,7 +61,7 @@ def init_s3_client():
     try:
       if MINIO_URL:
         if DEBUG:
-          print("connecting: "+MINIO_URL)
+          print("S3 access with URL: "+MINIO_URL)
         s3_client = boto3.client(
                       service_name='s3',
                       endpoint_url=MINIO_URL,
@@ -85,6 +85,9 @@ def init_s3_client():
       if DEBUG:
         print("ERROR: unable to connect to bucket")
       raise Exception('unable to connect to bucket')
+  else:
+    if DEBUG:
+      print("S3 client already initialized")
 
 class S3File:
   base_object = None
