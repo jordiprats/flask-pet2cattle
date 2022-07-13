@@ -38,7 +38,10 @@ else:
   S3_ENV_AUTH = False
 
 if not S3_ENV_AUTH:
-  MINIO_URL = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
+  if os.getenv('S3_PROVIDER', 'Minio') == 'Minio':
+    MINIO_URL = os.getenv('MINIO_URL', 'http://127.0.0.1:9000')
+  else:
+    MINIO_URL = None
 else:
   MINIO_URL = None
 
