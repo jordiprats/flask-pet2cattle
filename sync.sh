@@ -31,6 +31,11 @@ server_side_encryption =
 EOF
 fi
 
+if [ ! -z "${DEBUG}" ];
+then
+    cat ${HOME-/root}/.config/rclone/rclone.conf
+fi
+
 # check bucket
 
 rclone lsd remote: | grep "${MINIO_BUCKET}"
