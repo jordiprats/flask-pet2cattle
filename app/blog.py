@@ -74,6 +74,12 @@ except Exception as e:
     print('whoosh index error: '+str(e))
   pass
 
+ENABLE_SEARCH_BAR = os.getenv('ENABLE_SEARCH_BAR', False)
+
+if ENABLE_SEARCH_BAR:
+  # force enable search bar - whoosh might fail
+  search_enabled = True
+
 if DEBUG:
   print('search_enabled: '+str(search_enabled))
 
