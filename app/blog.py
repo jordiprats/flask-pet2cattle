@@ -536,9 +536,9 @@ def index(page):
   page_metadata['summary']=['Treat your clusters like cattle, not pets by using kubernetes, helm and terraform']
 
   webindex = get_webindex_page(page)
-
-  try:
-    if webindex:
+  
+  if webindex:
+    try:
       response = { 'Posts': [] }
 
       for post_url in webindex:
@@ -548,15 +548,17 @@ def index(page):
 
         response['next']=len(get_webindex_page(page+1))!=0
         response['page']=page
-      
+    except Exception as e:
       if DEBUG:
-        print("using webindex")
-    else:
-      if DEBUG:
-        print('error webindex')
-      abort(404)  
-  except:
-    abort(503)
+        print("exception: "+str(e))
+      abort(503)
+    if DEBUG:
+      print("using webindex")
+  else:
+    if DEBUG:
+      print('error webindex')
+    abort(404)  
+
 
   if len(response['Posts'])==0:
     if DEBUG:
