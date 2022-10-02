@@ -90,6 +90,12 @@ def get_archives():
   except:
     return {}
 
+@cache.cached(timeout=86400, key_prefix="get_webindex_page")
+def get_webindex_page(num):
+  try:
+    return pickle.loads(models.S3File('indexes', 'webindex.dict').get_data().read())[num]
+  except:
+    return None
 
 @cache.cached(timeout=7200, key_prefix="get_related_categories")
 def get_related_categories(category):
@@ -529,7 +535,28 @@ def index(page):
   page_metadata['keywords']=['kubernetes, helm, terraform, pet vs cattle']
   page_metadata['summary']=['Treat your clusters like cattle, not pets by using kubernetes, helm and terraform']
 
-  response = models.Post.all(page, 5)
+  webindex = get_webindex_page(page)
+
+  try:
+    if webindex:
+      response = { 'Posts': [] }
+
+      for post_url in webindex:
+        split_url = post_url.split('/')
+
+        response['Posts'].append(models.Post.filter(split_url[1], split_url[2], split_url[3])[0])
+
+        response['next']=len(get_webindex_page(page+1))!=0
+        response['page']=page
+      
+      if DEBUG:
+        print("using webindex")
+    else:
+      if DEBUG:
+        print('error webindex')
+      abort(404)  
+  except:
+    abort(503)
 
   if len(response['Posts'])==0:
     if DEBUG:

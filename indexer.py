@@ -280,7 +280,7 @@ if __name__ == "__main__":
                                   keywords=keywords, 
                                 )
 
-    # TODO: pàgines a indexar? per exemple CKA
+    # TODO: altres pagines a indexar? per exemple CKA
 
     idx_writer.commit()
 
@@ -321,7 +321,47 @@ if __name__ == "__main__":
     print("archives.dict OK")
 
   except Exception as e:
-    print("Error generant archive liust: "+str(e))
+    print("Error generant archive list: "+str(e))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+
+  #
+  # web index
+  #
+
+  try:
+    webindex = {}
+
+    page_num = 0
+    post_count = 0
+
+    for post in posts:
+      if post_count >= 5:
+        page_num+=1
+        post_count=0
+      
+      if page_num in webindex.keys():
+        webindex[page_num].append(post.get_url())
+      else:
+        webindex[page_num]=[post.get_url()]
+      
+      post_count+=1
+    
+    # print(str(webindex))
+
+    tmp_webindex = tempfile.TemporaryFile()
+
+    pickle.dump(webindex, tmp_webindex)
+    tmp_webindex.seek(os.SEEK_SET)
+
+    webindex_dict = app.models.S3File('indexes', 'webindex.dict')
+    webindex_dict.save(tmp_webindex)
+
+    print("webindex.dict OK")
+
+  except Exception as e:
+    print("Error generant page_index: "+str(e))
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
