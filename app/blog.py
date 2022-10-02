@@ -90,7 +90,7 @@ def get_archives():
   except:
     return {}
 
-# @cache.cached(timeout=86400, key_prefix="get_webindex_page")
+# @cache.cached(timeout=3600, key_prefix="get_webindex_page")
 def get_webindex_page(num):
   try:
     return pickle.loads(models.S3File('indexes', 'webindex.dict').get_data().read())[num]
