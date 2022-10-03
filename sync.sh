@@ -61,6 +61,7 @@ do
 
     if [[ "${CURRENT_HASH}" != "${PREV_HASH}" ]];
     then
+        echo "Updating S3..."
         rclone --no-update-modtime sync repo/favicon.ico "remote:${MINIO_BUCKET}"
         rclone --no-update-modtime sync repo/posts       "remote:${MINIO_BUCKET}/posts"
         rclone --no-update-modtime sync repo/pages       "remote:${MINIO_BUCKET}/pages"
