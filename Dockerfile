@@ -36,7 +36,7 @@ COPY sync.sh .
 COPY app /code/app
 COPY redirector /code/redirector
 
-RUN echo "0 * * * * python /code/indexer.py" | crontab -u root -
+RUN echo "0 * * * * python /code/indexer.py" > /var/spool/cron/crontabs/pet2cattle
 
 # posar el indexer i el cacherefresher com a serveis en un sol contenidor ?
 
@@ -44,6 +44,8 @@ RUN echo "0 * * * * python /code/indexer.py" | crontab -u root -
 
 RUN addgroup -g 1000 pet2cattle
 RUN adduser -u 1000 -G pet2cattle -D -h /home/pet2cattle pet2cattle
+
+RUN chown pet2cattle:pet2cattle /var/spool/cron/crontabs/pet2cattle
 
 RUN mkdir -p /home/pet2cattle
 RUN chown -R 1000:1000 /home/pet2cattle

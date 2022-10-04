@@ -152,6 +152,24 @@ def get_navigation():
 # ROUTES
 #
 
+@app.route('/crd-generator/')
+def crd_generator():
+  if DEBUG:
+    print('CRD generator')
+
+  page_metadata={}
+  page_metadata['title']=['Kubernetes: Object to CRD']
+  page_metadata['robots']='noindex,follow'
+  page_metadata['keywords']=['kubernetes', 'CRD', 'generator']
+  page_metadata['summary']=['Create CRD definitions based on sample objectss']
+
+  return render_template('k8s2crd.html', 
+                    post_metadata=page_metadata, 
+                    page_url='https://pet2cattle.com',
+                    navigation=get_navigation(),
+                    search_enabled=search_enabled
+                  )
+
 @app.route('/search/', defaults={'page': 0})
 @app.route('/search/page/<int:page>')
 def search(page):
