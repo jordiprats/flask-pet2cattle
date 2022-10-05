@@ -2,6 +2,37 @@
 
 {% block content %}
 
+<script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+<script>
+
+async function main() {
+  let pyodide = await loadPyodide({
+    indexURL : "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/"
+  });
+  btn = document.getElementById("runbutton")
+  btn.disabled = false;
+  btn.innerHTML = "Run";
+  return pyodide
+};
+
+// run the main function
+let pyodideReadyPromise = main();
+
+// pass the editor value to the pyodide.runPython function and show the result in the output section
+async function evaluatePython() {
+  let pyodide = await pyodideReadyPromise;
+  output = document.getElementById("output");
+  output.value = ''
+  try {
+    output.value = pyodide.runPython('"Hello world!"');
+  } catch (err) {
+    output.value = err;
+  }
+  document.getElementById("output").scrollIntoView();
+}
+
+</script>
+
   <!-- Page Content -->
   <div class="container">
 
@@ -16,16 +47,16 @@
 
         <br><br>
 
-        <textarea id="input" style="width: 100%;" rows="24"></textarea>
+        <textarea id="input" name="input" style="width: 100%;" rows="24"></textarea>
         
         <br /><br />
         
-        <button onclick="evaluatePython()">Run</button>
+        <button id="runbutton" name="runbutton" onclick="evaluatePython()" disabled >LOADING...</button>
         
         <br /><br />
 
         <div>Output:</div>
-        <textarea id="output" style="width: 100%;" rows="24s" disabled></textarea>
+        <textarea id="output" name="output" style="width: 100%;" rows="24s" readonly></textarea>
     
         <hr>
 
