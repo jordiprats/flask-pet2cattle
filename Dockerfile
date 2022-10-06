@@ -44,8 +44,6 @@ COPY redirector /code/redirector
 RUN addgroup -g 1000 pet2cattle
 RUN adduser -u 1000 -G pet2cattle -D -h /home/pet2cattle pet2cattle
 
-RUN chown pet2cattle:pet2cattle /var/spool/cron/crontabs/pet2cattle
-
 RUN mkdir -p /home/pet2cattle
 RUN chown -R 1000:1000 /home/pet2cattle
 
