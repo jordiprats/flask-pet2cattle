@@ -20,7 +20,7 @@ RUN pip install gunicorn
 COPY supervisor/supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /etc/supervisor.d/
 
-COPY supervisor/crond.ini /etc/supervisor.d/
+COPY supervisor/indexer.ini /etc/supervisor.d/
 COPY supervisor/cacherefresher.ini /etc/supervisor.d/
 
 
@@ -31,12 +31,11 @@ RUN pip install -r requirements.txt
 
 COPY sitemapgen.py .
 COPY indexer.py .
+COPY indexer.sh .
 COPY cacherefresher.py .
 COPY sync.sh .
 COPY app /code/app
 COPY redirector /code/redirector
-
-RUN echo "0 * * * * python /code/indexer.py" > /var/spool/cron/crontabs/pet2cattle
 
 # posar el indexer i el cacherefresher com a serveis en un sol contenidor ?
 
