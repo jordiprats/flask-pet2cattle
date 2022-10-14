@@ -22,6 +22,9 @@ async function loadCode() {
   return data
 }
 
+btn = document.getElementById("runbutton")
+btn.disabled = true;
+
 // run the main function
 let pyodideReadyPromise = main();
 let codeReadyPromise = loadCode();
