@@ -3,57 +3,6 @@
 {% block content %}
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
-<script>
-
-async function main() {
-  let pyodide = await loadPyodide({
-    indexURL : "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/"
-  });
-  btn = document.getElementById("runbutton")
-  btn.disabled = false;
-  btn.innerHTML = "Run";
-  return pyodide
-};
-
-async function loadCode() {
-  let response = await fetch('https://raw.githubusercontent.com/pet2cattle/python-k8s2crd/main/main.py');
-  let data = await response.text();
-
-  return data
-}
-
-btn = document.getElementById("runbutton")
-btn.disabled = true;
-
-// run the main function
-let pyodideReadyPromise = main();
-let codeReadyPromise = loadCode();
-
-// pass the editor value to the pyodide.runPython function and show the result in the output section
-async function evaluatePython() {
-  let pyodide = await pyodideReadyPromise;
-  let code = await codeReadyPromise;
-  await pyodide.loadPackage("https://files.pythonhosted.org/packages/97/14/8cc336ce44a1e9ab029e56ddcdfcf8803537cb6f494f7f813a74b4e7b66f/pureyaml-0.1.0-py2.py3-none-any.whl");
-  await pyodide.loadPackage("future");
-  await pyodide.loadPackage("https://files.pythonhosted.org/packages/a3/58/35da89ee790598a0700ea49b2a66594140f44dec458c07e8e3d4979137fc/ply-3.11-py2.py3-none-any.whl");
-  
-
-  input = document.getElementById("input");
-  output = document.getElementById("output");
-  output.value = ''
-  try {
-    runCode = 'input_str = """'+ input.value + '\n"""'
-    + "\n" + code + "\noutput"
-    console.log(runCode);
-    await pyodide.loadPackagesFromImports(runCode);
-    output.value = pyodide.runPython(runCode);
-  } catch (err) {
-    output.value = err;
-  }
-  document.getElementById("output").scrollIntoView();
-}
-
-</script>
 
   <!-- Page Content -->
   <div class="container">
@@ -83,6 +32,58 @@ async function evaluatePython() {
         <hr>
 
       </div>
+
+      <script>
+
+        async function main() {
+          let pyodide = await loadPyodide({
+            indexURL : "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/"
+          });
+          btn = document.getElementById("runbutton")
+          btn.disabled = false;
+          btn.innerHTML = "Run";
+          return pyodide
+        };
+        
+        async function loadCode() {
+          let response = await fetch('https://raw.githubusercontent.com/pet2cattle/python-k8s2crd/main/main.py');
+          let data = await response.text();
+        
+          return data
+        }
+        
+        btn = document.getElementById("runbutton")
+        btn.disabled = true;
+        
+        // run the main function
+        let pyodideReadyPromise = main();
+        let codeReadyPromise = loadCode();
+        
+        // pass the editor value to the pyodide.runPython function and show the result in the output section
+        async function evaluatePython() {
+          let pyodide = await pyodideReadyPromise;
+          let code = await codeReadyPromise;
+          await pyodide.loadPackage("https://files.pythonhosted.org/packages/97/14/8cc336ce44a1e9ab029e56ddcdfcf8803537cb6f494f7f813a74b4e7b66f/pureyaml-0.1.0-py2.py3-none-any.whl");
+          await pyodide.loadPackage("future");
+          await pyodide.loadPackage("https://files.pythonhosted.org/packages/a3/58/35da89ee790598a0700ea49b2a66594140f44dec458c07e8e3d4979137fc/ply-3.11-py2.py3-none-any.whl");
+          
+        
+          input = document.getElementById("input");
+          output = document.getElementById("output");
+          output.value = ''
+          try {
+            runCode = 'input_str = """'+ input.value + '\n"""'
+            + "\n" + code + "\noutput"
+            console.log(runCode);
+            await pyodide.loadPackagesFromImports(runCode);
+            output.value = pyodide.runPython(runCode);
+          } catch (err) {
+            output.value = err;
+          }
+          document.getElementById("output").scrollIntoView();
+        }
+        
+      </script>        
 
       <!-- Sidebar Widgets Column -->
       <div class="col-md-4">
