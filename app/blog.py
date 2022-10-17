@@ -168,6 +168,8 @@ def crd_generator():
   return render_template('k8s2crd.html', 
                     post_metadata=page_metadata, 
                     page_url='https://pet2cattle.com',
+                    tags=page_metadata['tags'],
+                    categories=page_metadata['categories'],
                     navigation=get_navigation(),
                     search_enabled=search_enabled
                   )
