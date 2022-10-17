@@ -159,9 +159,11 @@ def crd_generator():
 
   page_metadata={}
   page_metadata['title']=['Kubernetes: Object to CRD']
-  page_metadata['robots']='noindex,follow'
+  page_metadata['robots']='index,follow'
   page_metadata['keywords']=['kubernetes', 'CRD', 'generator']
-  page_metadata['summary']=['Create CRD definitions based on sample objectss']
+  page_metadata['categories']=['Kubernetes']
+  page_metadata['tags']=['CRD']
+  page_metadata['summary']=['Create CRD definitions based on sample objects']
 
   return render_template('k8s2crd.html', 
                     post_metadata=page_metadata, 
