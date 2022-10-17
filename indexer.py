@@ -90,7 +90,7 @@ if __name__ == "__main__":
     tag_keys = list(ordered_tag_cloud.keys())
     random.shuffle(tag_keys)
     for tag in tag_keys:
-      if ordered_tag_cloud[tag]['count']>2:
+      if ordered_tag_cloud[tag]['count']>3:
         tag_cloud[tag] = ordered_tag_cloud[tag]
         count += 1
         sum += tag_cloud[tag]['count']
