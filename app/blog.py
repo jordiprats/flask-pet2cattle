@@ -174,6 +174,28 @@ def crd_generator():
                     search_enabled=search_enabled
                   )
 
+@app.route('/mysql-memory-online-calculator/')
+def mysql_calculator():
+  if DEBUG:
+    print('MySQL calculator')
+
+  page_metadata={}
+  page_metadata['title']=['MySQL: Max memory online calculator']
+  page_metadata['robots']='index,follow'
+  page_metadata['keywords']=['MySQL', 'online', 'calculator', 'memory']
+  page_metadata['categories']=['MySQL']
+  page_metadata['tags']=['memory']
+  page_metadata['summary']=['Calculate the maximum amount of memory a MySQL instance can consume']
+
+  return render_template('k8s2crd.html', 
+                    post_metadata=page_metadata, 
+                    page_url='https://pet2cattle.com',
+                    tags=page_metadata['tags'],
+                    categories=page_metadata['categories'],
+                    navigation=get_navigation(),
+                    search_enabled=search_enabled
+                  )
+
 @app.route('/search/', defaults={'page': 0})
 @app.route('/search/page/<int:page>')
 def search(page):

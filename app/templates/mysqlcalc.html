@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+
+  <!-- Page Content -->
+  <div class="container">
+
+    <div class="row">
+
+      <!-- Post Content Column -->
+      <div class="col-lg-8">
+
+        <h1>Generate CRD definition</h1>
+
+        Paste the result of <b>SHOW GLOBAL VARIABLES;</b> and then click <b>Run</b> to the maximum amount of memory this MySQL instance can allocate:
+
+        <br><br>
+
+        <textarea id="input" name="input" style="width: 100%;" rows="24"></textarea>
+        
+        <br /><br />
+        
+        <button id="calcbutton" name="calcbutton" onclick="evaluatePython()" disabled >LOADING...</button>
+        
+        <br /><br />
+
+        <div>Output:</div>
+        <textarea id="output" name="output" style="width: 100%;" rows="24s" readonly></textarea>
+    
+        <hr>
+
+      </div>
+
+      <script>
+
+        async function main() {
+          let pyodide = await loadPyodide({
+            indexURL : "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/"
+          });
+          btn = document.getElementById("calcbutton")
+          btn.disabled = false;
+          btn.innerHTML = "Calculate";
+          return pyodide
+        };
+        
+        async function loadCode() {
+          let response = await fetch('https://raw.githubusercontent.com/jordiprats/python-mysqlmaxmemory/main/main.py');
+          let data = await response.text();
+        
+          return data
+        }
+        
+        btn = document.getElementById("calcbutton")
+        btn.disabled = true;
+        
+        // run the main function
+        let pyodideReadyPromise = main();
+        let codeReadyPromise = loadCode();
+        
+        // pass the editor value to the pyodide.runPython function and show the result in the output section
+        async function evaluatePython() {
+          let pyodide = await pyodideReadyPromise;
+          let code = await codeReadyPromise;         
+        
+          input = document.getElementById("input");
+          output = document.getElementById("output");
+          output.value = ''
+          try {
+            runCode = 'input_str = """'+ input.value + '\n"""'
+            + "\n" + code + "\noutput"
+            console.log(runCode);
+            await pyodide.loadPackagesFromImports(runCode);
+            output.value = pyodide.runPython(runCode);
+          } catch (err) {
+            output.value = err;
+          }
+          document.getElementById("output").scrollIntoView();
+        }
+        
+      </script>        
+
+      <!-- Sidebar Widgets Column -->
+      <div class="col-md-4">
+
+        <!-- Search Widget -->
+        {% include 'search.html' %}
+
+        <!-- Categories Widget -->
+        <div class="card my-4">
+          <h5 class="card-header">Categories</h5>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6">
+                <ul class="list-unstyled mb-0">
+                  {% for category in categories %}
+                  <li>
+                    <a href="/categories/{{ category|slugify }}/">{{ category }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div class="col-lg-6">
+                <ul class="list-unstyled mb-0">
+                  {% for tag in tags %}
+                  <li>
+                    <a href="/tags/{{ tag|slugify }}/">{{ tag }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side Widget -->
+        <!-- <div class="card my-4">
+          <h5 class="card-header">Side Widget</h5>
+          <div class="card-body">
+            You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
+          </div>
+        </div> -->
+
+      </div>
+
+    </div>
+    <!-- /.row -->
+
+  </div>
+  <!-- /.container -->
+{% endblock %}
