@@ -187,7 +187,7 @@ def mysql_calculator():
   page_metadata['tags']=['memory']
   page_metadata['summary']=['Calculate the maximum amount of memory a MySQL instance can consume']
 
-  return render_template('k8s2crd.html', 
+  return render_template('mysqlcalc.html', 
                     post_metadata=page_metadata, 
                     page_url='https://pet2cattle.com',
                     tags=page_metadata['tags'],
