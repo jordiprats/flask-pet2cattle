@@ -17,6 +17,9 @@
   {% endif %}
   <meta property="og:title" content="{{ post_metadata['title'][0] }}">
   <meta property="og:url" content="{{ page_url }}">
+  {% if post_html %}
+  <meta property="og:type" content="article">
+  {% endif %}
 
   {% if post_metadata['robots'] %}
   <meta name="Robots" content="{{ post_metadata['robots'] }}" />
