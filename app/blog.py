@@ -545,7 +545,7 @@ def post(year, month, slug):
                         single=True, 
                         post_html=post.html, 
                         post_metadata=post.metadata, 
-                        page_url=post.url,
+                        page_url='https://pet2cattle.com'+post.url,
                         canonical_url=CANONICAL_DOMAIN+post.url,
                         keywords=post.get_keywords(),
                         categories=post.get_categories(),
