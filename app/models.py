@@ -326,7 +326,8 @@ class Page(S3File):
     try:
       keywords = []
       for keyword in self.metadata['keywords'][0].split(','):
-        keywords.append(keyword.strip())
+        if keyword.strip() != "":
+          keywords.append(keyword.strip())
       return keywords
     except:
       return []
@@ -335,7 +336,8 @@ class Page(S3File):
     try:
       keywords = []
       for keyword in self.metadata['categories'][0].split(','):
-        keywords.append(keyword.strip())
+        if keyword.strip() != "":
+          keywords.append(keyword.strip())
       return keywords
     except:
       return []
@@ -344,7 +346,8 @@ class Page(S3File):
     try:
       keywords = []
       for keyword in self.metadata['autopage'][0].split(','):
-        keywords.append(keyword.strip())
+        if keyword.strip() != "":
+          keywords.append(keyword.strip())
       return keywords
     except:
       return []
@@ -354,7 +357,8 @@ class Page(S3File):
     try:
       keywords = []
       for keyword in self.metadata['tags'][0].split(','):
-        keywords.append(keyword.strip())
+        if keyword.strip() != "":
+          keywords.append(keyword.strip())
       return keywords
     except:
       return []
