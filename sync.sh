@@ -59,7 +59,7 @@ do
 
         nc -zv "$MINIO_HOST" "$MINIO_PORT"
 
-        if [ -ne 0 ];
+        if [ $? -ne 0 ];
         then
             echo "unable to reach $MINIO_HOST using port $MINIO_PORT"
             sleep "$(echo "$(echo $RANDOM | grep -Eo "[0-9]$")+1" | bc -l)"
