@@ -67,6 +67,8 @@ do
         fi
     fi
 
+    echo "attempting to sync"
+
     rm -fr repo
     mkdir repo
     git clone "${POSTS_REPO}" repo
@@ -88,5 +90,6 @@ do
     fi
 
     # random sleep between 30 an 39 minutes
+    echo "sleeping"
     sleep "$(echo "$(echo $RANDOM | grep -Eo "[0-9]$")+30" | bc -l)"m
 done
