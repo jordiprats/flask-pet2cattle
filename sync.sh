@@ -57,7 +57,7 @@ do
         MINIO_HOST=$(echo $MINIO_URL | rev | cut -f1 -d/ | rev | cut -f1 -d:)
         MINIO_PORT=$(echo $MINIO_URL | rev | cut -f1 -d/ | rev | cut -f2 -d:)
 
-        nc -zv "$MINIO_HOST" "$MINIO_PORT"
+        nc -zv -w 5 "$MINIO_HOST" "$MINIO_PORT"
 
         if [ $? -ne 0 ];
         then
