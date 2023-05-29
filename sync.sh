@@ -51,6 +51,22 @@ cd reposync_tmp
 
 while true;
 do
+
+    if [ ! -z "$MINIO_URL" ];
+    then
+        MINIO_HOST=$(echo $MINIO_URL | rev | cut -f1 -d/ | rev | cut -f1 -d:)
+        MINIO_PORT=$(echo $MINIO_URL | rev | cut -f1 -d/ | rev | cut -f2 -d:)
+
+        nc -zv "$MINIO_HOST" "$MINIO_PORT"
+
+        if [ -ne 0 ];
+        then
+            echo "unable to reach $MINIO_HOST using port $MINIO_PORT"
+            sleep "$(echo "$(echo $RANDOM | grep -Eo "[0-9]$")+1" | bc -l)"
+            exit 1
+        fi
+    fi
+
     rm -fr repo
     mkdir repo
     git clone "${POSTS_REPO}" repo
